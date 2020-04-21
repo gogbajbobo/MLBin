@@ -19,7 +19,9 @@
 
 # %%
 import h5py
+import matplotlib.pyplot as plt
 import numpy as np
+
 # %%
 sample_path = '/Users/grimax/Desktop/tmp/porous sample/tomo_rec_cut.h5'
 sample_file = h5py.File(sample_path, mode='r')
@@ -35,4 +37,17 @@ print(f'mean: {sample_mean:.2f}')
 print(f'std: {sample_std:.2f}')
 
 
+# %%
+def show_histogram(image):
+    img = np.ravel(image)
+    plt.figure(figsize=(15, 5))
+    plt.hist(img, bins=255, color='lightgray')
+    plt.figure(figsize=(15, 5))
+    plt.hist(img, bins=255, color='lightgray', log=True)
+
+
+# %%
+show_histogram(sample)
+
+# %%
 # %%
