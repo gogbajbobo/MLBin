@@ -47,26 +47,28 @@ def show_histogram(image):
 
 
 # %%
-def show_2d_sections(image, x=None, y=None, z=None):
-    shape = image.shape
-    x = x or shape[0]//2
-    y = y or shape[1]//2
-    z = z or shape[2]//2
-    vmin = np.min(image)
-    vmax = np.max(image)
+def show_2d_image(image, fig, axis, vmin, vmax, title):
+    im = axis.imshow(image, cmap='gray', vmin=vmin, vmax=vmax)
+    axis.set_title(title)
+    fig.colorbar(im, ax=axis)
+
+
+def show_2d_sections(image, x=0, y=0, z=0):
+    z_section = image[z, :, :]
+    y_section = image[:, y, :]
+    x_section = image[:, :, x]
+    sections_array = np.vstack((x_section, y_section, z_section))
+    vmin, vmax = np.min(sections_array), np.max(sections_array)
     fig, axes = plt.subplots(1, 3, figsize=(15, 5))
-    im0 = axes[0].imshow(image[x, :, :], cmap='gray', vmin=vmin, vmax=vmax)
-    fig.colorbar(im0, ax=axes[0])
-    im1 = axes[1].imshow(image[:, y, :], cmap='gray', vmin=vmin, vmax=vmax)
-    fig.colorbar(im1, ax=axes[1])
-    im2 = axes[2].imshow(image[:, :, z], cmap='gray', vmin=vmin, vmax=vmax)
-    fig.colorbar(im2, ax=axes[2])
+    show_2d_image(z_section, fig, axes[0], vmin, vmax, 'z')
+    show_2d_image(y_section, fig, axes[1], vmin, vmax, 'y')
+    show_2d_image(x_section, fig, axes[2], vmin, vmax, 'x')
 
 
 # %%
 show_histogram(sample)
 
 # %%
-show_2d_sections(sample)
+show_2d_sections(sample, x=150, z=25)
 
 # %%
