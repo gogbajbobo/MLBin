@@ -18,3 +18,21 @@
 # %autoreload 2
 
 # %%
+import h5py
+import numpy as np
+# %%
+sample_path = '/Users/grimax/Desktop/tmp/porous sample/tomo_rec_cut.h5'
+sample_file = h5py.File(sample_path, mode='r')
+sample = sample_file['Reconstruction']
+sample_min = np.min(sample)
+sample_max = np.max(sample)
+sample_mean = np.mean(sample)
+sample_std = np.std(sample)
+print(f'shape: {sample.shape}')
+print(f'min: {sample_min:.2f}')
+print(f'max: {sample_max:.2f}')
+print(f'mean: {sample_mean:.2f}')
+print(f'std: {sample_std:.2f}')
+
+
+# %%
