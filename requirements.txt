@@ -1,2 +1,4 @@
 jupyterlab
 jupytext
+h5py
+matplotlib
