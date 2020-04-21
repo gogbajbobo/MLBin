@@ -47,7 +47,26 @@ def show_histogram(image):
 
 
 # %%
+def show_2d_sections(image, x=None, y=None, z=None):
+    shape = image.shape
+    x = x or shape[0]//2
+    y = y or shape[1]//2
+    z = z or shape[2]//2
+    vmin = np.min(image)
+    vmax = np.max(image)
+    fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+    im0 = axes[0].imshow(image[x, :, :], cmap='gray', vmin=vmin, vmax=vmax)
+    fig.colorbar(im0, ax=axes[0])
+    im1 = axes[1].imshow(image[:, y, :], cmap='gray', vmin=vmin, vmax=vmax)
+    fig.colorbar(im1, ax=axes[1])
+    im2 = axes[2].imshow(image[:, :, z], cmap='gray', vmin=vmin, vmax=vmax)
+    fig.colorbar(im2, ax=axes[2])
+
+
+# %%
 show_histogram(sample)
 
 # %%
+show_2d_sections(sample)
+
 # %%
