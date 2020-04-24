@@ -66,3 +66,55 @@ def show_2d_sections(image, x=0, y=0, z=0):
 def plot_column(image, x=0, y=0):
     plt.figure(figsize=(15, 5))
     plt.plot(image[:, y, x])
+
+
+def mod_otsu(histogram):
+    n_bins = np.size(histogram)
+    zero_class_count = 0
+    zero_class_sum = 0
+    total_count = np.sum(histogram)
+    total_sum = np.sum(np.arange(n_bins) * histogram)
+    total_mean = total_sum / total_count
+    total_variance = np.sum((np.arange(n_bins) - total_mean) ** 2
+                            * histogram) / total_count
+    criteria = np.zeros(np.size(histogram) - 1, dtype=np.float64)
+    for bin_index, bin_value in enumerate(histogram[:-1]):
+        zero_class_count += bin_value
+        zero_class_sum += bin_index * bin_value
+        zero_class_probability = zero_class_count / total_count
+        zero_class_mean = zero_class_sum / zero_class_count
+        first_class_count = total_count - zero_class_count
+        first_class_sum = total_sum - zero_class_sum
+        first_class_probability = 1 - zero_class_probability
+        first_class_mean = first_class_sum / first_class_count
+        variance_between = zero_class_probability * first_class_probability \
+                           * (zero_class_mean - first_class_mean) ** 2
+        variance_within = total_variance - variance_between
+        criteria[bin_index] \
+            = zero_class_probability * np.log(zero_class_probability) \
+              + first_class_probability * np.log(first_class_probability) \
+              - np.log(variance_within)
+    otsu_level = np.argmax(criteria) + 1
+
+    return otsu_level, criteria
+
+
+def binarize_image(image):
+
+    result = np.copy(image)
+    result -= np.min(result)
+    result /= np.max(result)
+    result = (result * 255).astype(np.uint8)
+
+    hist, _ = np.histogram(result.ravel(), bins=256)
+    otsu_level, _ = mod_otsu(hist)
+
+    result[result < otsu_level] = False
+    result[result >= otsu_level] = True
+
+    porosity = 1 - np.count_nonzero(result)/result.size
+
+    print(f'Otsu level: {otsu_level}')
+    print(f'Porosity: {porosity}')
+
+    return result
