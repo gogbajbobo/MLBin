@@ -3,3 +3,4 @@ jupytext
 h5py
 matplotlib
 scikit-image
+numpy
