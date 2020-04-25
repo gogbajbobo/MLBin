@@ -5,9 +5,10 @@ from skimage import filters
 from skimage import morphology
 
 
-def get_data_from_file(file_path, group_name):
+def get_data_from_file(file_path, group_name, type=None):
     file = h5py.File(file_path, mode='r')
-    return file[group_name]
+    result = file[group_name][()].astype(np.bool) if type == 'bool' else file[group_name][()]
+    return result
 
 
 def save_data_to_file(file_path, group_name, data):
