@@ -40,10 +40,11 @@ def plot_histogram(data, xmin=None, xmax=None, log=False):
     xmin and xmax and plt.xlim(xmin, xmax)
 
 
-def show_histogram(image, xmin=None, xmax=None):
+def show_histogram(image, xmin=None, xmax=None, log=False):
     img = np.ravel(image)
     plot_histogram(img, xmin, xmax)
-    plot_histogram(img, xmin, xmax, True)
+    if log:
+        plot_histogram(img, xmin, xmax, log)
 
 
 def show_2d_image(image, fig, axis, vmin, vmax, title):
