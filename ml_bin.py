@@ -21,23 +21,29 @@
 import helper
 
 # %%
-sample = helper.get_data_from_file('/Users/grimax/Desktop/tmp/porous sample/sample.h5', 'Reconstruction')[()]
+recalculate = False
+
+# %%
+sample = helper.get_data_from_file('/Users/grimax/Desktop/tmp/porous sample/sample.h5', 'Reconstruction')
 
 sample_filtered_path = '/Users/grimax/Desktop/tmp/porous sample/sample_filtered.h5'
 
-# sample_filtered = helper.filter_image(sample)
-# helper.save_data_to_file(sample_filtered_path, 'Filtered', sample_filtered)
+if recalculate:
+    sample_filtered = helper.filter_image(sample)
+    helper.save_data_to_file(sample_filtered_path, 'Filtered', sample_filtered)
 
-sample_filtered = helper.get_data_from_file(sample_filtered_path, 'Filtered')[()]
+sample_filtered = helper.get_data_from_file(sample_filtered_path, 'Filtered')
 
 sample_diff = sample - sample_filtered
 
 bin_sample_path = '/Users/grimax/Desktop/tmp/porous sample/bin_sample.h5'
 
-# bin_sample = helper.binarize_image(sample)
-# helper.save_data_to_file(bin_sample_path, 'Binarized', bin_sample)
+if recalculate:
+    bin_sample = helper.binarize_image(sample)
+    helper.save_data_to_file(bin_sample_path, 'Binarized', bin_sample)
 
-bin_sample = helper.get_data_from_file(bin_sample_path, 'Binarized')[()]
+bin_sample = helper.get_data_from_file(bin_sample_path, 'Binarized', 'bool')
+
 
 # %%
 sample_shape, sample_min, sample_max, sample_mean, sample_std = helper.image_stats(sample)
