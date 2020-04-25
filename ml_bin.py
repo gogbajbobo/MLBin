@@ -63,7 +63,6 @@ z_slice = 25
 helper.show_histogram(sample, xmin=sample_min, xmax=sample_max)
 helper.show_histogram(sample_filtered, xmin=sample_f_min, xmax=sample_f_max)
 helper.show_histogram(sample_diff, xmin=sample_diff_min, xmax=sample_diff_max)
-helper.show_histogram(bin_sample)
 
 # %%
 helper.show_2d_sections(sample, x=x_slice, y=y_slice, z=z_slice)
