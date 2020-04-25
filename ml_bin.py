@@ -44,6 +44,7 @@ if recalculate:
 
 bin_sample = helper.get_data_from_file(bin_sample_path, 'Binarized', 'bool')
 
+bin_sample_filled = helper.fill_floating_solids_and_closed_pores(bin_sample)
 
 # %%
 sample_shape, sample_min, sample_max, sample_mean, sample_std = helper.image_stats(sample)
