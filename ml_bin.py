@@ -58,6 +58,7 @@ helper.image_stats(bin_sample)
 x_slice = 150
 y_slice = 0
 z_slice = 25
+helper.image_stats(bin_sample_filled)
 
 # %%
 helper.show_histogram(sample, xmin=sample_min, xmax=sample_max)
@@ -69,11 +70,13 @@ helper.show_2d_sections(sample, x=x_slice, y=y_slice, z=z_slice)
 helper.show_2d_sections(sample_filtered, x=x_slice, y=y_slice, z=z_slice)
 helper.show_2d_sections(sample_diff, x=x_slice, y=y_slice, z=z_slice)
 helper.show_2d_sections(bin_sample, x=x_slice, y=y_slice, z=z_slice)
+helper.show_2d_sections(bin_sample_filled, x=x_slice, y=y_slice, z=z_slice)
 
 # %%
 helper.plot_column(sample)
 helper.plot_column(sample_filtered)
 helper.plot_column(sample_diff)
 helper.plot_column(bin_sample)
+helper.plot_column(bin_sample_filled)
 
 # %%
