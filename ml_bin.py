@@ -53,17 +53,17 @@ sample_shape, sample_min, sample_max, sample_mean, sample_std = helper.image_sta
 sample_f_shape, sample_f_min, sample_f_max, sample_f_mean, sample_f_std = helper.image_stats(sample_filtered)
 sample_diff_shape, sample_diff_min, sample_diff_max, sample_diff_mean, sample_diff_std = helper.image_stats(sample_diff)
 helper.image_stats(bin_sample)
-
-# %%
-x_slice = 150
-y_slice = 0
-z_slice = 25
 helper.image_stats(bin_sample_filled)
 
 # %%
 helper.show_histogram(sample, xmin=sample_min, xmax=sample_max)
 helper.show_histogram(sample_filtered, xmin=sample_f_min, xmax=sample_f_max)
 helper.show_histogram(sample_diff, xmin=sample_diff_min, xmax=sample_diff_max)
+
+# %%
+x_slice = 150
+y_slice = 25
+z_slice = 25
 
 # %%
 helper.show_2d_sections(sample, x=x_slice, y=y_slice, z=z_slice)
