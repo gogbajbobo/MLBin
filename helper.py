@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from skimage import filters
 from skimage import morphology
+import porespy as ps
 
 
 def get_data_from_file(file_path, group_name, type=None):
@@ -125,3 +126,13 @@ def calc_porosity(image):
     print(f'Porosity: {porosity}')
     return porosity
 
+
+def fill_floating_solids_and_closed_pores(image):
+    image_filled = np.copy(image)
+    floating_solids = ps.filters.find_disconnected_voxels(image_filled)
+    closed_pores = ps.filters.find_disconnected_voxels(~image_filled)
+    print(f'Floating solids: {np.sum(floating_solids)}')
+    print(f'Closed pores: {np.sum(closed_pores)}')
+    image_filled[floating_solids] = False
+    image_filled[closed_pores] = True
+    return image_filled
