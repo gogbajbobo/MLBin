@@ -108,13 +108,18 @@ def binarize_image(image):
 
     hist, _ = np.histogram(result.ravel(), bins=256)
     otsu_level, _ = mod_otsu(hist)
+    print(f'Otsu level: {otsu_level}')
 
     result[result < otsu_level] = False
     result[result >= otsu_level] = True
 
-    porosity = 1 - np.count_nonzero(result)/result.size
-
-    print(f'Otsu level: {otsu_level}')
-    print(f'Porosity: {porosity}')
+    calc_porosity(result)
 
     return result
+
+
+def calc_porosity(image):
+    porosity = 1 - np.count_nonzero(image)/image.size
+    print(f'Porosity: {porosity}')
+    return porosity
+
