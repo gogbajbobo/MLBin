@@ -21,20 +21,10 @@
 import helper
 
 # %%
-recalculate = False
+recalculate = True
 
 # %%
 sample = helper.get_data_from_file('/Users/grimax/Desktop/tmp/porous sample/sample.h5', 'Reconstruction')
-
-sample_filtered_path = '/Users/grimax/Desktop/tmp/porous sample/sample_filtered.h5'
-
-if recalculate:
-    sample_filtered = helper.filter_image(sample, 9)
-    helper.save_data_to_file(sample_filtered_path, 'Filtered', sample_filtered)
-
-sample_filtered = helper.get_data_from_file(sample_filtered_path, 'Filtered')
-
-sample_diff = sample - sample_filtered
 
 bin_sample_path = '/Users/grimax/Desktop/tmp/porous sample/bin_sample.h5'
 
@@ -47,6 +37,31 @@ helper.calc_porosity(bin_sample)
 
 bin_sample_filled = helper.fill_floating_solids_and_closed_pores(bin_sample)
 helper.calc_porosity(bin_sample_filled)
+
+sample_filtered_path = '/Users/grimax/Desktop/tmp/porous sample/sample_filtered.h5'
+
+if recalculate:
+    sample_filtered = helper.filter_image(sample, 9)
+    helper.save_data_to_file(sample_filtered_path, 'Filtered', sample_filtered)
+
+# %%
+# sample_filtered_path = '/Users/grimax/Desktop/tmp/porous sample/sample_filtered_median_5.h5'
+
+sample_filtered = helper.get_data_from_file(sample_filtered_path, 'Filtered')
+
+sample_diff = sample - sample_filtered
+
+bin_sample_filtered_path = '/Users/grimax/Desktop/tmp/porous sample/bin_sample_filtered.h5'
+
+if recalculate:
+    bin_sample_filtered = helper.binarize_image(sample_filtered)
+    helper.save_data_to_file(bin_sample_filtered_path, 'Binarized', bin_sample_filtered)
+
+bin_sample_filtered = helper.get_data_from_file(bin_sample_filtered_path, 'Binarized', 'bool')
+helper.calc_porosity(bin_sample_filtered)
+
+bin_sample_filtered_filled = helper.fill_floating_solids_and_closed_pores(bin_sample_filtered)
+helper.calc_porosity(bin_sample_filtered_filled)
 
 # %%
 sample_shape, sample_min, sample_max, sample_mean, sample_std = helper.image_stats(sample)
