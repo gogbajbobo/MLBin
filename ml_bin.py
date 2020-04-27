@@ -29,7 +29,7 @@ sample = helper.get_data_from_file('/Users/grimax/Desktop/tmp/porous sample/samp
 sample_filtered_path = '/Users/grimax/Desktop/tmp/porous sample/sample_filtered.h5'
 
 if recalculate:
-    sample_filtered = helper.filter_image(sample)
+    sample_filtered = helper.filter_image(sample, 9)
     helper.save_data_to_file(sample_filtered_path, 'Filtered', sample_filtered)
 
 sample_filtered = helper.get_data_from_file(sample_filtered_path, 'Filtered')

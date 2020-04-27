@@ -17,8 +17,8 @@ def save_data_to_file(file_path, group_name, data):
     file.create_dataset(group_name, data=data, compression='lzf')
 
 
-def filter_image(image):
-    return filters.median(image, morphology.cube(3))
+def filter_image(image, width=3):
+    return filters.median(image, morphology.cube(width))
 
 
 def image_stats(image):
