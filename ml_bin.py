@@ -88,6 +88,8 @@ helper.show_2d_sections(sample_filtered, x=x_slice, y=y_slice, z=z_slice)
 helper.show_2d_sections(sample_diff, x=x_slice, y=y_slice, z=z_slice)
 helper.show_2d_sections(bin_sample, x=x_slice, y=y_slice, z=z_slice)
 helper.show_2d_sections(bin_sample_filled, x=x_slice, y=y_slice, z=z_slice)
+helper.show_2d_sections(bin_sample_filtered, x=x_slice, y=y_slice, z=z_slice)
+helper.show_2d_sections(bin_sample_filtered_filled, x=x_slice, y=y_slice, z=z_slice)
 
 # %%
 helper.plot_column(sample)
@@ -95,5 +97,7 @@ helper.plot_column(sample_filtered)
 helper.plot_column(sample_diff)
 helper.plot_column(bin_sample)
 helper.plot_column(bin_sample_filled)
+helper.plot_column(bin_sample_filtered)
+helper.plot_column(bin_sample_filtered_filled)
 
 # %%
