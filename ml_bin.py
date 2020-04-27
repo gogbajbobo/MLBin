@@ -101,3 +101,24 @@ helper.plot_column(bin_sample_filtered)
 helper.plot_column(bin_sample_filtered_filled)
 
 # %%
+axes_elements_lengths = helper.get_full_lengths_stats(bin_image=bin_sample_filtered_filled)
+print(axes_elements_lengths.shape)
+
+# %%
+helper.get_stats(axes_elements_lengths)
+
+# %%
+helper.show_histogram(axes_elements_lengths, log=True)
+
+# %%
+import numpy as np
+np.unique(axes_elements_lengths)
+
+# %%
+el_len_bins = np.bincount(axes_elements_lengths.astype(np.uint8))
+print(el_len_bins)
+
+# %%
+el_len_bins[1:] - el_len_bins[:-1]
+
+# %%

@@ -136,3 +136,36 @@ def fill_floating_solids_and_closed_pores(image):
     image_filled[floating_solids] = False
     image_filled[closed_pores] = True
     return image_filled
+
+
+def get_full_lengths_stats(bin_image):
+    axes_el_lengths = np.array([])
+    for axis in range(len(bin_image.shape)):
+        axes_el_lengths = np.append(axes_el_lengths, get_lengths_stats(bin_image, axis))
+    return axes_el_lengths
+
+
+def get_lengths_stats(bin_image, axis):
+    if 0 > axis > 2:
+        raise ValueError('incorrect value of axis')
+    el_lengths = np.array([])
+    z, y, x = bin_image.shape
+    range_1 = range(y) if axis == 0 else range(x) if axis == 1 else range(z)
+    range_2 = range(x) if axis == 0 else range(z) if axis == 1 else range(y)
+    for i in range_1:
+        for j in range_2:
+            stripe = get_stripe(bin_image, axis, i, j)
+            boarders = stripe[1:] != stripe[:-1]
+            boarders = np.append(boarders, True)
+            indexes = np.where(boarders)[0] + 1
+            line_elements = np.split(boarders, indexes)
+            element_lengths = np.array([len(elem) for elem in line_elements])
+            element_lengths = np.array(list(filter(lambda el: el, element_lengths)))
+            el_lengths = np.append(el_lengths, element_lengths)
+    return el_lengths
+
+
+def get_stripe(image, axis, i ,j):
+    if 0 > axis > 2:
+        raise ValueError('incorrect value of axis')
+    return np.copy(image[:, i, j]) if axis == 0 else np.copy(image[i, :, j]) if axis == 1 else np.copy(image[i, j, :])
