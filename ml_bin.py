@@ -64,11 +64,13 @@ bin_sample_filtered_filled = helper.fill_floating_solids_and_closed_pores(bin_sa
 helper.calc_porosity(bin_sample_filtered_filled)
 
 # %%
-sample_shape, sample_min, sample_max, sample_mean, sample_std = helper.image_stats(sample)
-sample_f_shape, sample_f_min, sample_f_max, sample_f_mean, sample_f_std = helper.image_stats(sample_filtered)
-sample_diff_shape, sample_diff_min, sample_diff_max, sample_diff_mean, sample_diff_std = helper.image_stats(sample_diff)
-helper.image_stats(bin_sample)
-helper.image_stats(bin_sample_filled)
+sample_shape, sample_min, sample_max, sample_mean, sample_std = helper.get_stats(sample)
+sample_f_shape, sample_f_min, sample_f_max, sample_f_mean, sample_f_std = helper.get_stats(sample_filtered)
+sample_diff_shape, sample_diff_min, sample_diff_max, sample_diff_mean, sample_diff_std = helper.get_stats(sample_diff)
+helper.get_stats(bin_sample)
+helper.get_stats(bin_sample_filled)
+helper.get_stats(bin_sample_filtered)
+helper.get_stats(bin_sample_filtered_filled)
 
 # %%
 helper.show_histogram(sample, xmin=sample_min, xmax=sample_max)

@@ -21,7 +21,7 @@ def filter_image(image, width=3):
     return filters.median(image, morphology.cube(width))
 
 
-def image_stats(image):
+def get_stats(image):
     im_shape = image.shape
     im_min = np.min(image)
     im_max = np.max(image)
