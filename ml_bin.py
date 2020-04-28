@@ -121,11 +121,13 @@ print(np.sum(test_sample))
 helper.show_3d_image(test_sample)
 
 # %%
-sample_stones = np.copy(sample)[bin_sample_filtered_filled == True]
+sample_stones = np.copy(sample)[bin_sample_filled == True]
 sample_stones_shape, sample_stones_min, sample_stones_max, sample_stones_mean, sample_stones_std = helper.get_stats(sample_stones)
 
-sample_pores = np.copy(sample)[bin_sample_filtered_filled == False]
+sample_pores = np.copy(sample)[bin_sample_filled == False]
 sample_pores_shape, sample_pores_min, sample_pores_max, sample_pores_mean, sample_pores_std = helper.get_stats(sample_pores)
+
+print(f'Diff: {np.prod(bin_sample_filtered_filled.shape) - (sample_stones_shape[0] + sample_pores_shape[0])}')
 
 # %%
 stones_hist = np.histogram(sample_stones, bins=256)
@@ -137,5 +139,34 @@ pores_hist = np.histogram(sample_pores, bins=256)
 pores_peak = pores_hist[1][np.argmax(pores_hist[0])]
 print(f'pores peak: {pores_peak}')
 helper.show_histogram_with_vline(sample_pores, [sample_pores_mean, pores_peak], log=True)
+
+# %%
+bin_sample_erosion = helper.erosion(bin_sample_filled)
+bin_sample_dilation = helper.dilation(bin_sample_filled)
+
+helper.show_2d_sections(bin_sample, x=x_slice, y=y_slice, z=z_slice)
+helper.show_2d_sections(bin_sample_erosion, x=x_slice, y=y_slice, z=z_slice)
+helper.show_2d_sections(bin_sample_dilation, x=x_slice, y=y_slice, z=z_slice)
+
+# %%
+stones_erosion = np.copy(sample)[bin_sample_erosion == True]
+se_shape, se_min, se_max, se_mean, se_std = helper.get_stats(stones_erosion)
+
+pores_dilation = np.copy(sample)[bin_sample_dilation == False]
+pd_shape, pd_min, pd_max, pd_mean, pd_std = helper.get_stats(pores_dilation)
+
+print(f'Diff: {np.prod(sample.shape) - (se_shape[0] + pd_shape[0])}')
+print(f'Borders: {(np.prod(sample.shape) - (se_shape[0] + pd_shape[0])) / np.prod(sample.shape)}')
+
+# %%
+se_hist = np.histogram(stones_erosion, bins=256)
+se_peak = se_hist[1][np.argmax(se_hist[0])]
+print(f'stones erosion peak: {se_peak}')
+helper.show_histogram_with_vline(stones_erosion, [se_mean, se_peak], log=True)
+
+pd_hist = np.histogram(pores_dilation, bins=256)
+pd_peak = pd_hist[1][np.argmax(pd_hist[0])]
+print(f'pores dilation peak: {pd_peak}')
+helper.show_histogram_with_vline(pores_dilation, [pd_mean, pd_peak], log=True)
 
 # %%
