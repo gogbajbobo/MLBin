@@ -37,7 +37,7 @@ def get_stats(image):
 
 def plot_histogram(data, xmin=None, xmax=None, log=False):
     plt.figure(figsize=(15, 5))
-    plt.hist(data, bins=255, color='lightgray', log=log)
+    plt.hist(data, bins=256, color='lightgray', log=log)
     xmin and xmax and plt.xlim(xmin, xmax)
 
 
