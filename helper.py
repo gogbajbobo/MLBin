@@ -71,6 +71,13 @@ def plot_column(image, x=0, y=0):
     plt.plot(image[:, y, x])
 
 
+def show_3d_image(image, title=None):
+    fig = plt.figure(figsize=(10, 10))
+    ax = fig.gca(projection='3d')
+    ax.voxels(image, edgecolor='k')
+    plt.title(title or '3d preview')
+
+
 def mod_otsu(histogram):
     n_bins = np.size(histogram)
     zero_class_count = 0

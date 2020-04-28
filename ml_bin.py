@@ -21,7 +21,7 @@
 import helper
 
 # %%
-recalculate = True
+recalculate = False
 
 # %%
 sample = helper.get_data_from_file('/Users/grimax/Desktop/tmp/porous sample/sample.h5', 'Reconstruction')
@@ -45,7 +45,7 @@ if recalculate:
     helper.save_data_to_file(sample_filtered_path, 'Filtered', sample_filtered)
 
 # %%
-# sample_filtered_path = '/Users/grimax/Desktop/tmp/porous sample/sample_filtered_median_5.h5'
+sample_filtered_path = '/Users/grimax/Desktop/tmp/porous sample/sample_filtered_median_9.h5'
 
 sample_filtered = helper.get_data_from_file(sample_filtered_path, 'Filtered')
 
@@ -73,9 +73,9 @@ helper.get_stats(bin_sample_filtered)
 helper.get_stats(bin_sample_filtered_filled)
 
 # %%
-helper.show_histogram(sample, xmin=sample_min, xmax=sample_max)
-helper.show_histogram(sample_filtered, xmin=sample_f_min, xmax=sample_f_max)
-helper.show_histogram(sample_diff, xmin=sample_diff_min, xmax=sample_diff_max)
+helper.show_histogram(sample, xmin=sample_min, xmax=sample_max, log=True)
+helper.show_histogram(sample_filtered, xmin=sample_f_min, xmax=sample_f_max, log=True)
+helper.show_histogram(sample_diff, xmin=sample_diff_min, xmax=sample_diff_max, log=True)
 
 # %%
 x_slice = 150
@@ -120,5 +120,24 @@ print(el_len_bins)
 
 # %%
 el_len_bins[1:] - el_len_bins[:-1]
+
+# %%
+test_sample = np.copy(sample[0:99, 0:99, 0:99])
+threshold = 3.5
+test_sample[test_sample < threshold] = 0
+test_sample[test_sample >= threshold] = 1
+print(np.sum(test_sample))
+helper.show_3d_image(test_sample)
+
+# %%
+sample_stones = np.copy(sample)[bin_sample_filtered_filled == True]
+helper.get_stats(sample_stones)
+
+sample_pores = np.copy(sample)[bin_sample_filtered_filled == False]
+helper.get_stats(sample_pores)
+
+# %%
+helper.show_histogram(sample_stones, log=True)
+helper.show_histogram(sample_pores, log=True)
 
 # %%
