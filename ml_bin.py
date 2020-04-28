@@ -102,24 +102,15 @@ helper.plot_column(bin_sample_filtered_filled)
 
 # %%
 axes_elements_lengths = helper.get_full_lengths_stats(bin_image=bin_sample_filtered_filled)
-print(axes_elements_lengths.shape)
-
-# %%
 helper.get_stats(axes_elements_lengths)
 
 # %%
-helper.show_histogram(axes_elements_lengths, log=True)
+helper.show_histogram(axes_elements_lengths, log=False)
 
 # %%
 import numpy as np
-np.unique(axes_elements_lengths)
-
-# %%
 el_len_bins = np.bincount(axes_elements_lengths.astype(np.uint8))
-print(el_len_bins)
-
-# %%
-el_len_bins[1:] - el_len_bins[:-1]
+helper.plot_line(el_len_bins[1:] - el_len_bins[:-1])
 
 # %%
 test_sample = np.copy(sample[0:99, 0:99, 0:99])
@@ -131,13 +122,20 @@ helper.show_3d_image(test_sample)
 
 # %%
 sample_stones = np.copy(sample)[bin_sample_filtered_filled == True]
-helper.get_stats(sample_stones)
+sample_stones_shape, sample_stones_min, sample_stones_max, sample_stones_mean, sample_stones_std = helper.get_stats(sample_stones)
 
 sample_pores = np.copy(sample)[bin_sample_filtered_filled == False]
-helper.get_stats(sample_pores)
+sample_pores_shape, sample_pores_min, sample_pores_max, sample_pores_mean, sample_pores_std = helper.get_stats(sample_pores)
 
 # %%
-helper.show_histogram(sample_stones, log=True)
-helper.show_histogram(sample_pores, log=True)
+stones_hist = np.histogram(sample_stones, bins=256)
+stones_peak = stones_hist[1][np.argmax(stones_hist[0])]
+print(f'stones peak: {stones_peak}')
+helper.show_histogram_with_vline(sample_stones, [sample_stones_mean, stones_peak], log=True)
+
+pores_hist = np.histogram(sample_pores, bins=256)
+pores_peak = pores_hist[1][np.argmax(pores_hist[0])]
+print(f'pores peak: {pores_peak}')
+helper.show_histogram_with_vline(sample_pores, [sample_pores_mean, pores_peak], log=True)
 
 # %%
