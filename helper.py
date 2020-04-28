@@ -21,6 +21,14 @@ def filter_image(image, width=3):
     return filters.median(image, morphology.cube(width))
 
 
+def erosion(image):
+    return morphology.binary_erosion(image, morphology.cube(3))
+
+
+def dilation(image):
+    return morphology.binary_dilation(image, morphology.cube(3))
+
+
 def get_stats(image):
     im_shape = image.shape
     im_min = np.min(image)
