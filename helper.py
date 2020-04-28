@@ -90,6 +90,11 @@ def show_3d_image(image, title=None):
     plt.title(title or '3d preview')
 
 
+def plot_line(line):
+    plt.figure(figsize=(15, 5))
+    plt.plot(line)
+
+
 def mod_otsu(histogram):
     n_bins = np.size(histogram)
     zero_class_count = 0
