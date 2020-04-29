@@ -144,6 +144,9 @@ helper.show_histogram_with_vline(sample_pores, [sample_pores_mean, pores_peak], 
 bin_sample_erosion = helper.erosion(bin_sample_filled)
 bin_sample_dilation = helper.dilation(bin_sample_filled)
 
+helper.calc_porosity(bin_sample_erosion)
+helper.calc_porosity(bin_sample_dilation)
+
 helper.show_2d_sections(bin_sample, x=x_slice, y=y_slice, z=z_slice)
 helper.show_2d_sections(bin_sample_erosion, x=x_slice, y=y_slice, z=z_slice)
 helper.show_2d_sections(bin_sample_dilation, x=x_slice, y=y_slice, z=z_slice)
