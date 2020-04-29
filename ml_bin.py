@@ -173,3 +173,19 @@ print(f'pores dilation peak: {pd_peak}')
 helper.show_histogram_with_vline(pores_dilation, [pd_mean, pd_peak], log=True)
 
 # %%
+widths = se_edges[1:] - se_edges[:-1]
+se_values = np.array([v + widths[i]/2 for i, v in np.ndenumerate(se_edges[:-1])])
+
+widths = pd_edges[1:] - pd_edges[:-1]
+pd_values = np.array([v + widths[i]/2 for i, v in np.ndenumerate(pd_edges[:-1])])
+
+stones_pdf = se_hist / np.sum(se_hist)
+pores_pdf = pd_hist / np.sum(pd_hist)
+
+stones_pdf_test = np.random.choice(se_values, size=8457901, p=stones_pdf)
+pores_pdf_test = np.random.choice(pd_values, size=3220295, p=pores_pdf)
+
+helper.show_histogram(stones_pdf_test, log=True)
+helper.show_histogram(pores_pdf_test, log=True)
+
+# %%
