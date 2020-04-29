@@ -162,13 +162,13 @@ print(f'Diff: {np.prod(sample.shape) - (se_shape[0] + pd_shape[0])}')
 print(f'Borders: {(np.prod(sample.shape) - (se_shape[0] + pd_shape[0])) / np.prod(sample.shape)}')
 
 # %%
-se_hist = np.histogram(stones_erosion, bins=256)
-se_peak = se_hist[1][np.argmax(se_hist[0])]
+se_hist, se_edges = np.histogram(stones_erosion, bins=256)
+se_peak = se_edges[np.argmax(se_hist)]
 print(f'stones erosion peak: {se_peak}')
 helper.show_histogram_with_vline(stones_erosion, [se_mean, se_peak], log=True)
 
-pd_hist = np.histogram(pores_dilation, bins=256)
-pd_peak = pd_hist[1][np.argmax(pd_hist[0])]
+pd_hist, pd_edges = np.histogram(pores_dilation, bins=256)
+pd_peak = pd_edges[np.argmax(pd_hist)]
 print(f'pores dilation peak: {pd_peak}')
 helper.show_histogram_with_vline(pores_dilation, [pd_mean, pd_peak], log=True)
 
