@@ -190,3 +190,31 @@ helper.show_histogram(stones_pdf_test, log=True)
 helper.show_histogram(pores_pdf_test, log=True)
 
 # %%
+phantom = avg.blobs(shape=sample.shape, porosity=porosity, blobiness=0.8)
+helper.show_2d_sections(bin_sample_filtered, x=x_slice, y=y_slice, z=z_slice)
+helper.show_2d_sections(phantom)
+
+# %%
+phantom_with_noise = np.zeros(phantom.shape)
+phantom_with_noise[phantom == True] = np.random.choice(se_values, size=(phantom[phantom == True]).shape[0], p=stones_pdf)
+phantom_with_noise[phantom == False] = np.random.choice(pd_values, size=(phantom[phantom == False]).shape[0], p=pores_pdf)
+
+# %%
+helper.show_2d_sections(sample, x=x_slice, y=y_slice, z=z_slice)
+helper.show_2d_sections(phantom_with_noise, vmin=-0.8, vmax=3.8)
+
+# %%
+helper.show_histogram(sample, log=True)
+helper.show_histogram(phantom_with_noise, log=True)
+
+# %%
+phantom_with_noise_binarized = helper.binarize_image(phantom_with_noise)
+
+# %%
+phantom_with_noise_binarized_filled = helper.fill_floating_solids_and_closed_pores(phantom_with_noise_binarized)
+
+# %%
+helper.show_2d_sections(bin_sample, x=x_slice, y=y_slice, z=z_slice)
+helper.show_2d_sections(phantom_with_noise_binarized)
+
+# %%
