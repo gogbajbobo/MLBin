@@ -34,7 +34,7 @@ if recalculate:
     helper.save_data_to_file(bin_sample_path, 'Binarized', bin_sample)
 
 bin_sample = helper.get_data_from_file(bin_sample_path, 'Binarized', 'bool')
-helper.calc_porosity(bin_sample)
+porosity = helper.calc_porosity(bin_sample)
 
 bin_sample_filled = helper.fill_floating_solids_and_closed_pores(bin_sample)
 helper.calc_porosity(bin_sample_filled)
