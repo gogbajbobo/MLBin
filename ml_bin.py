@@ -19,6 +19,7 @@
 
 # %%
 import helper
+import anisotropic_volume_generator as avg
 
 # %%
 recalculate = False
