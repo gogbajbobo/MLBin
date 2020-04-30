@@ -207,3 +207,19 @@ def get_stripe(image, axis, i ,j):
     if 0 > axis > 2:
         raise ValueError('incorrect value of axis')
     return np.copy(image[:, i, j]) if axis == 0 else np.copy(image[i, :, j]) if axis == 1 else np.copy(image[i, j, :])
+
+
+def scatter_plot(x, y, colors, title, xlim=(0, 1), ylim=(0, 1), figsize=(10, 10), padding=(0, 0)):
+    plt.figure(figsize=figsize)
+    plt.xlim(xlim[0] - padding[0], xlim[1] + padding[0])
+    plt.ylim(ylim[0] - padding[1], ylim[1] + padding[1])
+    plt.scatter(x, y, marker='.', c=colors)
+    plt.title(title)
+
+
+def scatter_plot_values(x, y, origin, title, indices, xlim=(0, 1), ylim=(0, 1), figsize=(10, 10), padding=(0, 0)):
+    x_part = np.take(x, indices)
+    y_part = np.take(y, indices)
+    origin_part = np.take(origin, indices)
+    colors = ['red' if el else 'blue' for el in origin_part]
+    scatter_plot(x_part, y_part, colors, title, xlim, ylim, figsize, padding)
