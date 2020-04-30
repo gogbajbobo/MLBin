@@ -79,12 +79,13 @@ def show_2d_image(image, fig, axis, vmin, vmax, title):
     fig.colorbar(im, ax=axis)
 
 
-def show_2d_sections(image, x=0, y=0, z=0):
+def show_2d_sections(image, x=0, y=0, z=0, vmin=None, vmax=None):
     z_section = image[z, :, :]
     y_section = image[:, y, :]
     x_section = image[:, :, x]
-    sections_array = np.vstack((x_section, y_section, z_section))
-    vmin, vmax = np.min(sections_array), np.max(sections_array)
+    if vmin is None or vmax is None:
+        sections_array = np.vstack((x_section, y_section, z_section))
+        vmin, vmax = np.min(sections_array), np.max(sections_array)
     fig, axes = plt.subplots(1, 3, figsize=(15, 5))
     show_2d_image(z_section, fig, axes[0], vmin, vmax, 'z')
     show_2d_image(y_section, fig, axes[1], vmin, vmax, 'y')
