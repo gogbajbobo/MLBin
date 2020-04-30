@@ -20,6 +20,7 @@
 # %%
 import helper
 import anisotropic_volume_generator as avg
+from scipy import ndimage
 
 # %%
 recalculate = False
@@ -216,5 +217,40 @@ phantom_with_noise_binarized_filled = helper.fill_floating_solids_and_closed_por
 # %%
 helper.show_2d_sections(bin_sample, x=x_slice, y=y_slice, z=z_slice)
 helper.show_2d_sections(phantom_with_noise_binarized)
+
+# %%
+dim = len(phantom.shape)
+kern_shape = tuple(1 for _ in range(dim))
+kern = np.zeros(kern_shape)
+kern = np.pad(kern, 1, constant_values=1)
+kern /= 3 ** dim - 1
+
+# %%
+sample_convolute = ndimage.convolve(sample, kern)
+phantom_convolute = ndimage.convolve(phantom_with_noise, kern)
+helper.show_2d_sections(sample_convolute, x=x_slice, y=y_slice, z=z_slice)
+helper.show_2d_sections(phantom_convolute, vmin=-0.8, vmax=3.8)
+
+# %%
+im_lenght = np.prod(sample.shape)
+coeff = 100
+sample_lenght = (im_lenght / coeff).astype(np.int)
+indices = (np.random.rand(sample_lenght) * im_lenght).astype(np.int)
+
+# %%
+x = sample.flatten()
+xlim = (np.min(x), np.max(x))
+y = sample_convolute.flatten()
+ylim = (np.min(y), np.max(y))
+origin = bin_sample.flatten()
+helper.scatter_plot_values(x, y, origin, 'exp data', indices, xlim=xlim, ylim=ylim)
+
+# %%
+x = phantom_with_noise.flatten()
+xlim = (np.min(x), np.max(x))
+y = phantom_convolute.flatten()
+ylim = (np.min(y), np.max(y))
+origin = phantom_with_noise_binarized.flatten()
+helper.scatter_plot_values(x, y, origin, 'phantom data', indices, xlim=xlim, ylim=ylim)
 
 # %%
