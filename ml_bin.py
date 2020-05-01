@@ -20,6 +20,7 @@
 # %%
 import helper
 import anisotropic_volume_generator as avg
+import numpy as np
 from scipy import ndimage
 
 # %%
@@ -110,7 +111,6 @@ helper.get_stats(axes_elements_lengths)
 helper.show_histogram(axes_elements_lengths, log=False)
 
 # %%
-import numpy as np
 el_len_bins = np.bincount(axes_elements_lengths.astype(np.uint8))
 helper.plot_line(el_len_bins[1:] - el_len_bins[:-1])
 
