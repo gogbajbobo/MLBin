@@ -21,6 +21,7 @@
 import helper
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy import signal
 
 # %%
 sample = helper.get_data_from_file('/Users/grimax/Desktop/tmp/porous sample/sample.h5', 'Reconstruction')
@@ -36,6 +37,11 @@ sample_fft_phase = np.fft.fftshift(np.angle(sample_fft))
 # %%
 helper.show_2d_sections(sample_fft_abs, x=125, y=125, z=125)
 helper.show_2d_sections(sample_fft_phase, x=125, y=125, z=125)
+
+# %%
+b, a = signal.butter(40, 0.5, 'high')
+w, h = signal.freqz(b, a)
+plt.plot(w, np.abs(h))
 
 # %%
 sample_ifft = np.fft.ifftn(sample_fft_abs).real
