@@ -254,3 +254,6 @@ origin = phantom_with_noise_binarized.flatten()
 helper.scatter_plot_values(x, y, origin, 'phantom data', indices, xlim=xlim, ylim=ylim)
 
 # %%
+helper.save_data_to_file('/Users/grimax/Desktop/tmp/porous sample/phantom_with_noise.h5', 'Phantom', phantom_with_noise)
+
+# %%
