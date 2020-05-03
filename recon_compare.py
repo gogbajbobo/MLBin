@@ -60,14 +60,127 @@ helper.show_2d_sections(phantom_recon_90_ramp, x=x_slice, y=y_slice, z=z_slice)
 helper.show_2d_sections(phantom_recon_180_ramp, x=x_slice, y=y_slice, z=z_slice)
 
 # %%
+noise_method = 'poisson'
+noise_parameter = 100
+phantom_recon_45_ramp_noise_100 = moe.process_image(
+    phantom, 45, reconstruct_filter=reconstruct_filter, noise_parameter=noise_parameter, noise_method=noise_method
+)
+phantom_recon_90_ramp_noise_100 = moe.process_image(
+    phantom, 90, reconstruct_filter=reconstruct_filter, noise_parameter=noise_parameter, noise_method=noise_method
+)
+phantom_recon_180_ramp_noise_100 = moe.process_image(
+    phantom, 180, reconstruct_filter=reconstruct_filter, noise_parameter=noise_parameter, noise_method=noise_method
+)
+
+helper.show_2d_sections(phantom_recon_45_ramp_noise_100, x=x_slice, y=y_slice, z=z_slice)
+helper.show_2d_sections(phantom_recon_90_ramp_noise_100, x=x_slice, y=y_slice, z=z_slice)
+helper.show_2d_sections(phantom_recon_180_ramp_noise_100, x=x_slice, y=y_slice, z=z_slice)
+
+
+reconstruct_filter='shepp-logan'
+phantom_recon_45_shepp_logan = moe.process_image(phantom, 45, reconstruct_filter=reconstruct_filter)
+phantom_recon_90_shepp_logan = moe.process_image(phantom, 90, reconstruct_filter=reconstruct_filter)
+phantom_recon_180_shepp_logan = moe.process_image(phantom, 180, reconstruct_filter=reconstruct_filter)
+
+helper.show_2d_sections(phantom_recon_45_shepp_logan, x=x_slice, y=y_slice, z=z_slice)
+helper.show_2d_sections(phantom_recon_90_shepp_logan, x=x_slice, y=y_slice, z=z_slice)
+helper.show_2d_sections(phantom_recon_180_shepp_logan, x=x_slice, y=y_slice, z=z_slice)
+
+phantom_recon_45_shepp_logan_noise_100 = moe.process_image(
+    phantom, 45, reconstruct_filter=reconstruct_filter, noise_parameter=noise_parameter, noise_method=noise_method
+)
+phantom_recon_90_shepp_logan_noise_100 = moe.process_image(
+    phantom, 90, reconstruct_filter=reconstruct_filter, noise_parameter=noise_parameter, noise_method=noise_method
+)
+phantom_recon_180_shepp_logan_noise_100 = moe.process_image(
+    phantom, 180, reconstruct_filter=reconstruct_filter, noise_parameter=noise_parameter, noise_method=noise_method
+)
+
+helper.show_2d_sections(phantom_recon_45_shepp_logan_noise_100, x=x_slice, y=y_slice, z=z_slice)
+helper.show_2d_sections(phantom_recon_90_shepp_logan_noise_100, x=x_slice, y=y_slice, z=z_slice)
+helper.show_2d_sections(phantom_recon_180_shepp_logan_noise_100, x=x_slice, y=y_slice, z=z_slice)
+
+
+reconstruct_filter='hamming'
+phantom_recon_45_hamming = moe.process_image(phantom, 45, reconstruct_filter=reconstruct_filter)
+phantom_recon_90_hamming = moe.process_image(phantom, 90, reconstruct_filter=reconstruct_filter)
+phantom_recon_180_hamming = moe.process_image(phantom, 180, reconstruct_filter=reconstruct_filter)
+
+helper.show_2d_sections(phantom_recon_45_hamming, x=x_slice, y=y_slice, z=z_slice)
+helper.show_2d_sections(phantom_recon_90_hamming, x=x_slice, y=y_slice, z=z_slice)
+helper.show_2d_sections(phantom_recon_180_hamming, x=x_slice, y=y_slice, z=z_slice)
+
+phantom_recon_45_hamming_noise_100 = moe.process_image(
+    phantom, 45, reconstruct_filter=reconstruct_filter, noise_parameter=noise_parameter, noise_method=noise_method
+)
+phantom_recon_90_hamming_noise_100 = moe.process_image(
+    phantom, 90, reconstruct_filter=reconstruct_filter, noise_parameter=noise_parameter, noise_method=noise_method
+)
+phantom_recon_180_hamming_noise_100 = moe.process_image(
+    phantom, 180, reconstruct_filter=reconstruct_filter, noise_parameter=noise_parameter, noise_method=noise_method
+)
+
+helper.show_2d_sections(phantom_recon_45_hamming_noise_100, x=x_slice, y=y_slice, z=z_slice)
+helper.show_2d_sections(phantom_recon_90_hamming_noise_100, x=x_slice, y=y_slice, z=z_slice)
+helper.show_2d_sections(phantom_recon_180_hamming_noise_100, x=x_slice, y=y_slice, z=z_slice)
+
+
+# %%
 reconstruct_sart=True
+
 phantom_recon_45_sart = moe.process_image(phantom, 45, reconstruct_sart=reconstruct_sart)
 phantom_recon_90_sart = moe.process_image(phantom, 90, reconstruct_sart=reconstruct_sart)
 phantom_recon_180_sart = moe.process_image(phantom, 180, reconstruct_sart=reconstruct_sart)
 
-# %%
 helper.show_2d_sections(phantom_recon_45_sart, x=x_slice, y=y_slice, z=z_slice)
 helper.show_2d_sections(phantom_recon_90_sart, x=x_slice, y=y_slice, z=z_slice)
 helper.show_2d_sections(phantom_recon_180_sart, x=x_slice, y=y_slice, z=z_slice)
+
+phantom_recon_45_sart_noise_100 = moe.process_image(
+    phantom, 45, reconstruct_sart=reconstruct_sart, noise_parameter=noise_parameter, noise_method=noise_method
+)
+phantom_recon_90_sart_noise_100 = moe.process_image(
+    phantom, 90, reconstruct_sart=reconstruct_sart, noise_parameter=noise_parameter, noise_method=noise_method
+)
+phantom_recon_180_sart_noise_100 = moe.process_image(
+    phantom, 180, reconstruct_sart=reconstruct_sart, noise_parameter=noise_parameter, noise_method=noise_method
+)
+
+helper.show_2d_sections(phantom_recon_45_sart_noise_100, x=x_slice, y=y_slice, z=z_slice)
+helper.show_2d_sections(phantom_recon_90_sart_noise_100, x=x_slice, y=y_slice, z=z_slice)
+helper.show_2d_sections(phantom_recon_180_sart_noise_100, x=x_slice, y=y_slice, z=z_slice)
+
+# %%
+noise_parameter = 30
+
+phantom_recon_45_hamming_noise_30 = moe.process_image(
+    phantom, 45, reconstruct_filter=reconstruct_filter, noise_parameter=noise_parameter, noise_method=noise_method
+)
+phantom_recon_90_hamming_noise_30 = moe.process_image(
+    phantom, 90, reconstruct_filter=reconstruct_filter, noise_parameter=noise_parameter, noise_method=noise_method
+)
+phantom_recon_180_hamming_noise_30 = moe.process_image(
+    phantom, 180, reconstruct_filter=reconstruct_filter, noise_parameter=noise_parameter, noise_method=noise_method
+)
+
+helper.show_2d_sections(phantom_recon_45_hamming_noise_30, x=x_slice, y=y_slice, z=z_slice)
+helper.show_2d_sections(phantom_recon_90_hamming_noise_30, x=x_slice, y=y_slice, z=z_slice)
+helper.show_2d_sections(phantom_recon_180_hamming_noise_30, x=x_slice, y=y_slice, z=z_slice)
+
+
+phantom_recon_45_sart_noise_30 = moe.process_image(
+    phantom, 45, reconstruct_sart=reconstruct_sart, noise_parameter=noise_parameter, noise_method=noise_method
+)
+phantom_recon_90_sart_noise_30 = moe.process_image(
+    phantom, 90, reconstruct_sart=reconstruct_sart, noise_parameter=noise_parameter, noise_method=noise_method
+)
+phantom_recon_180_sart_noise_30 = moe.process_image(
+    phantom, 180, reconstruct_sart=reconstruct_sart, noise_parameter=noise_parameter, noise_method=noise_method
+)
+
+helper.show_2d_sections(phantom_recon_45_sart_noise_30, x=x_slice, y=y_slice, z=z_slice)
+helper.show_2d_sections(phantom_recon_90_sart_noise_30, x=x_slice, y=y_slice, z=z_slice)
+helper.show_2d_sections(phantom_recon_180_sart_noise_30, x=x_slice, y=y_slice, z=z_slice)
+
 
 # %%
