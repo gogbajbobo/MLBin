@@ -223,3 +223,28 @@ def scatter_plot_values(x, y, origin, title, indices, xlim=(0, 1), ylim=(0, 1), 
     origin_part = np.take(origin, indices)
     colors = ['red' if el else 'blue' for el in origin_part]
     scatter_plot(x_part, y_part, colors, title, xlim, ylim, figsize, padding)
+
+
+def crop(img, shape, center=None):
+
+    def left_edge(index):
+        return np.ceil(center[index] - halves[index]).astype(np.int)
+
+    def right_edge(index):
+        return np.ceil(center[index] + halves[index] + odds[index]).astype(np.int)
+
+    if center is None:
+        center = [x // 2 for x in img.shape]
+
+    halves = [x // 2 for x in shape]
+    odds = [x % 2 for x in shape]
+
+    ranges = (
+        slice(
+            left_edge(i),
+            right_edge(i)
+        )
+        for i in range(img.ndim)
+    )
+
+    return img[tuple(ranges)]
