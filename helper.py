@@ -165,10 +165,18 @@ def calc_porosity(image):
     return porosity
 
 
+def get_floating_solids(image):
+    return ps.filters.find_disconnected_voxels(image)
+
+
+def get_closed_pores(image):
+    return ps.filters.find_disconnected_voxels(~image)
+
+
 def fill_floating_solids_and_closed_pores(image):
     image_filled = np.copy(image).astype(np.bool)
-    floating_solids = ps.filters.find_disconnected_voxels(image_filled)
-    closed_pores = ps.filters.find_disconnected_voxels(~image_filled)
+    floating_solids = get_floating_solids(image_filled)
+    closed_pores = get_closed_pores(image_filled)
     print(f'Floating solids: {np.sum(floating_solids)}')
     print(f'Closed pores: {np.sum(closed_pores)}')
     image_filled[floating_solids] = False
