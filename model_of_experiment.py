@@ -85,11 +85,9 @@ def sinogram_blurring(sinograms):
     result = np.empty_like(_sinograms)
     for angle in np.arange(num_of_angles):
         projection = _sinograms[:, :, angle] if dim == 3 else _sinograms[:, angle]
-        print(projection)
         projection_dim = len(projection.shape)
         for axis in np.arange(projection_dim):
             output = ndimage.gaussian_filter1d(projection, gauss_sigma, axis)
             projection = output
-        print(projection)
         result[:, :, angle] = projection
     return result
