@@ -22,6 +22,7 @@ import helper
 import anisotropic_volume_generator as avg
 import numpy as np
 from scipy import ndimage
+import matplotlib.pyplot as plt
 
 # %%
 recalculate = False
@@ -203,6 +204,11 @@ phantom_with_noise[phantom == False] = np.random.choice(pd_values, size=(phantom
 # %%
 helper.show_2d_sections(sample, x=x_slice, y=y_slice, z=z_slice)
 helper.show_2d_sections(phantom_with_noise, vmin=-0.8, vmax=3.8)
+
+# %%
+fig, axes = plt.subplots(1, 2, figsize=(20, 10))
+helper.show_2d_image(sample[0:125, 125, 0:125], fig, axes[0], None, None, None)
+helper.show_2d_image(phantom_with_noise[0:125, 125, 0:125], fig, axes[1], None, None, None)
 
 # %%
 helper.show_histogram(sample, log=True)
