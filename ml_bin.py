@@ -263,3 +263,51 @@ helper.scatter_plot_values(x, y, origin, 'phantom data', indices, xlim=xlim, yli
 helper.save_data_to_file('/Users/grimax/Desktop/tmp/porous sample/phantom_with_noise.h5', 'Phantom', phantom_with_noise)
 
 # %%
+sample_noise = helper.get_data_from_file('/Users/grimax/Desktop/tmp/porous sample/sample_noise.h5', 'Noise')
+helper.get_stats(sample_noise)
+helper.show_2d_sections(sample_noise)
+
+phantom_fft_noise = np.zeros(phantom.shape)
+phantom_fft_noise[phantom == True] = se_mean
+phantom_fft_noise[phantom == False] = pd_mean
+helper.get_stats(phantom_fft_noise)
+helper.show_2d_sections(phantom_fft_noise)
+
+phantom_fft_noise += sample_noise
+helper.get_stats(phantom_fft_noise)
+helper.show_2d_sections(phantom_fft_noise)
+
+# %%
+x = phantom_fft_noise.flatten()
+xlim = (np.min(x), np.max(x))
+y = ndimage.convolve(phantom_fft_noise, kern).flatten()
+ylim = (np.min(y), np.max(y))
+origin = phantom.flatten()
+helper.scatter_plot_values(x, y, origin, 'phantom fft noise data', indices, xlim=xlim, ylim=ylim)
+
+# %%
+sample_flat = sample.flatten()
+sample_convolute_flat = sample_convolute.flatten()
+
+x = sample_flat
+xlim = (np.min(x), np.max(x))
+y = sample_convolute_flat
+ylim = (np.min(y), np.max(y))
+origin = bin_sample_filled.flatten()
+helper.scatter_plot_values(x, y, origin, 'exp data', indices, xlim=xlim, ylim=ylim)
+
+x = sample_flat
+xlim = (np.min(x), np.max(x))
+y = sample_convolute_flat
+ylim = (np.min(y), np.max(y))
+origin = bin_sample_erosion.flatten()
+helper.scatter_plot_values(x, y, origin, 'bin_sample_erosion data', indices, xlim=xlim, ylim=ylim)
+
+x = sample_flat
+xlim = (np.min(x), np.max(x))
+y = sample_convolute_flat
+ylim = (np.min(y), np.max(y))
+origin = bin_sample_dilation.flatten()
+helper.scatter_plot_values(x, y, origin, 'bin_sample_dilation data', indices, xlim=xlim, ylim=ylim)
+
+# %%
