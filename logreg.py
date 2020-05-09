@@ -1,7 +1,6 @@
 import numpy as np
 from sklearn import preprocessing
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import classification_report
 
 
 def train_logreg_model(pixel_values, neighbor_average, pixel_bin_values):
