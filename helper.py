@@ -22,11 +22,11 @@ def filter_image(image, width=3):
 
 
 def erosion(image):
-    return morphology.binary_erosion(image, morphology.cube(3))
+    return morphology.binary_erosion(image, None)  # morphology.cube(3)
 
 
 def dilation(image):
-    return morphology.binary_dilation(image, morphology.cube(3))
+    return morphology.binary_dilation(image, None)  # morphology.cube(3)
 
 
 def get_stats(image):
