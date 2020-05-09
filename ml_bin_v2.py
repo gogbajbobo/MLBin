@@ -23,6 +23,7 @@ import anisotropic_volume_generator as avg
 import numpy as np
 import model_of_experiment as moe
 from scipy import ndimage
+from sklearn.metrics import classification_report
 from sklearn.metrics import jaccard_score
 import logreg
 
@@ -106,7 +107,29 @@ helper.scatter_plot_values(x, y, origin, 'phantom_recon vs phantom_recon_bin_dil
 # %%
 phantom_recon_convolve = ndimage.convolve(phantom_recon, kern)
 
-logreg.train_logreg_model(phantom_recon, phantom_recon_convolve, phantom)
+lr, x_, y_ = logreg.train_logreg_model(phantom_recon, phantom_recon_convolve, phantom)
+y_predict = lr.predict(x)
+print(f'LR.coef_ { lr.coef_ }, LR.intercept_ { lr.intercept_ }, LR.classes_ { lr.classes_ }')
+print(f'classification_report { classification_report(y_, y_predict) }')
+print(f'prediction score: { lr.score(x_, y_) }')
+print(f'jaccard score: { jaccard_score(y_predict, y_) }\n')
+
+# %%
+coef = lr.coef_[0, :]
+x_coef = coef[1]
+y_coef = coef[0]
+intercept = lr.intercept_[0]
+x = x_[:, 1]
+y = x_[:, 0]
+
+def y_line(x0):
+    return (-(x0 * x_coef) - intercept) / y_coef
+
+xmin, xmax = x.min(), x.max()
+ymin, ymax = y_line(xmin), y_line(xmax)
+
+origin = phantom.flatten()
+helper.scatter_plot_values_with_line(x, y, origin, 'phantom_recon vs phantom', indices, xlim=xlim, ylim=ylim, figsize=figsize, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax)
 
 # %%
 phantom_recon_filtered = ndimage.convolve(phantom_recon, kern)
