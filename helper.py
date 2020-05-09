@@ -233,6 +233,19 @@ def scatter_plot_values(x, y, origin, title, indices, xlim=(0, 1), ylim=(0, 1), 
     scatter_plot(x_part, y_part, colors, title, xlim, ylim, figsize, padding)
 
 
+def scatter_plot_values_with_line(
+        x, y, origin, title, indices, xlim=(0, 1), ylim=(0, 1), figsize=(10, 10), padding=(0, 0),
+        xmin=None, xmax=None, ymin=None, ymax=None
+):
+    x_part = np.take(x, indices)
+    y_part = np.take(y, indices)
+    origin_part = np.take(origin, indices)
+    colors = ['red' if el else 'blue' for el in origin_part]
+    scatter_plot(x_part, y_part, colors, title, xlim, ylim, figsize, padding)
+    if np.all([xmin, xmax, ymin, ymax]):
+        plt.plot([xmin, xmax], [ymin, ymax], color='gray')
+
+
 def crop(img, shape, center=None):
 
     def left_edge(index):
