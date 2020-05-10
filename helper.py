@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from skimage import filters
 from skimage import morphology
 import porespy as ps
+from scipy import ndimage
 
 
 def get_data_from_file(file_path, group_name, type=None):
@@ -217,7 +218,24 @@ def get_stripe(image, axis, i ,j):
     return np.copy(image[:, i, j]) if axis == 0 else np.copy(image[i, :, j]) if axis == 1 else np.copy(image[i, j, :])
 
 
-def scatter_plot(x, y, colors, title, xlim=(0, 1), ylim=(0, 1), figsize=(10, 10), padding=(0, 0)):
+def convolve_kern(image):
+    dim = len(image.shape)
+    kern_shape = tuple(1 for _ in range(dim))
+    kern = np.ones(kern_shape)
+    kern = np.pad(kern, 1, constant_values=1)
+    kern /= 3 ** dim - 1
+    return kern
+
+
+def scatter_indices(image):
+    im_length = np.prod(image.shape)
+    coeff = 100
+    sample_length = (im_length / coeff).astype(np.int)
+    indices = (np.random.rand(sample_length) * im_length).astype(np.int)
+    return indices
+
+
+def show_scatter_plot(x, y, colors, title, xlim=(0, 1), ylim=(0, 1), figsize=(10, 10), padding=(0, 0)):
     plt.figure(figsize=figsize)
     plt.xlim(xlim[0] - padding[0], xlim[1] + padding[0])
     plt.ylim(ylim[0] - padding[1], ylim[1] + padding[1])
@@ -225,25 +243,42 @@ def scatter_plot(x, y, colors, title, xlim=(0, 1), ylim=(0, 1), figsize=(10, 10)
     plt.title(title)
 
 
+def scatter_plot(image, origin, title):
+    figsize = (5, 5)
+    x = np.copy(image).flatten()
+    xlim = (np.min(x), np.max(x))
+    y = ndimage.convolve(image, convolve_kern(image)).flatten()
+    ylim = (np.min(y), np.max(y))
+    scatter_plot_values(x, y, origin, title, scatter_indices(image), xlim=xlim, ylim=ylim, figsize=figsize)
+
+
+def scatter_plot_with_logreg_line(image, origin, title, lr):
+    coef = lr.coef_[0, :]
+    x_coef = coef[0]
+    y_coef = coef[1]
+    intercept = lr.intercept_[0]
+    xmin, xmax = np.min(image), np.max(image)
+
+    def y_line(x0):
+        return (-(x0 * x_coef) - intercept) / y_coef
+
+    ymin, ymax = y_line(xmin), y_line(xmax)
+    print(f'xmin, xmax, ymin, ymax, x_coef: {xmin, xmax, ymin, ymax, x_coef}')
+    scatter_plot_with_line(image, origin, title, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax)
+
+
+def scatter_plot_with_line(image, origin, title, xmin=None, xmax=None, ymin=None, ymax=None):
+    scatter_plot(image, origin, title)
+    if np.all([xmin, xmax, ymin, ymax]):
+        plt.plot([xmin, xmax], [ymin, ymax], color='gray')
+
+
 def scatter_plot_values(x, y, origin, title, indices, xlim=(0, 1), ylim=(0, 1), figsize=(10, 10), padding=(0, 0)):
     x_part = np.take(x, indices)
     y_part = np.take(y, indices)
     origin_part = np.take(origin, indices)
     colors = ['red' if el else 'blue' for el in origin_part]
-    scatter_plot(x_part, y_part, colors, title, xlim, ylim, figsize, padding)
-
-
-def scatter_plot_values_with_line(
-        x, y, origin, title, indices, xlim=(0, 1), ylim=(0, 1), figsize=(10, 10), padding=(0, 0),
-        xmin=None, xmax=None, ymin=None, ymax=None
-):
-    x_part = np.take(x, indices)
-    y_part = np.take(y, indices)
-    origin_part = np.take(origin, indices)
-    colors = ['red' if el else 'blue' for el in origin_part]
-    scatter_plot(x_part, y_part, colors, title, xlim, ylim, figsize, padding)
-    if np.all([xmin, xmax, ymin, ymax]):
-        plt.plot([xmin, xmax], [ymin, ymax], color='gray')
+    show_scatter_plot(x_part, y_part, colors, title, xlim, ylim, figsize, padding)
 
 
 def crop(img, shape, center=None):
