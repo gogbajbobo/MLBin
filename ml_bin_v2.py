@@ -23,8 +23,6 @@ import anisotropic_volume_generator as avg
 import numpy as np
 import model_of_experiment as moe
 from scipy import ndimage
-from sklearn.metrics import classification_report
-from sklearn.metrics import jaccard_score
 import logreg
 
 # %%
@@ -52,26 +50,7 @@ helper.show_2d_sections(phantom_recon, x=x_slice, y=y_slice, z=z_slice)
 helper.show_histogram(phantom_recon, xmin=phantom_recon_min, xmax=phantom_recon_max, log=True)
 
 # %%
-dim = len(phantom.shape)
-kern_shape = tuple(1 for _ in range(dim))
-kern = np.ones(kern_shape)
-kern = np.pad(kern, 1, constant_values=1)
-kern /= 3 ** dim - 1
-
-# %%
-im_lenght = np.prod(phantom.shape)
-coeff = 100
-sample_lenght = (im_lenght / coeff).astype(np.int)
-indices = (np.random.rand(sample_lenght) * im_lenght).astype(np.int)
-
-# %%
-figsize = (5, 5)
-x = phantom_recon.flatten()
-xlim = (np.min(x), np.max(x))
-y = ndimage.convolve(phantom_recon, kern).flatten()
-ylim = (np.min(y), np.max(y))
-origin = phantom.flatten()
-helper.scatter_plot_values(x, y, origin, 'phantom_recon vs phantom', indices, xlim=xlim, ylim=ylim, figsize=figsize)
+helper.scatter_plot(phantom_recon, phantom, 'phantom_recon vs phantom')
 
 # %%
 phantom_recon_bin = helper.binarize_image(phantom_recon)
@@ -80,8 +59,7 @@ print(f'Floating solids: {np.sum(floating_solids)}')
 # helper.show_2d_sections(phantom_recon_bin, x=x_slice, y=y_slice, z=z_slice)
 
 # %%
-origin = phantom_recon_bin.flatten()
-helper.scatter_plot_values(x, y, origin, 'phantom_recon vs phantom_recon_bin', indices, xlim=xlim, ylim=ylim, figsize=figsize)
+helper.scatter_plot(phantom_recon, phantom_recon_bin, 'phantom_recon vs phantom_recon_bin')
 
 # %%
 phantom_recon_bin_filled = helper.fill_floating_solids_and_closed_pores(phantom_recon_bin)
@@ -98,63 +76,26 @@ helper.show_2d_sections(phantom_recon_bin_erosion, x=x_slice, y=y_slice, z=z_sli
 helper.show_2d_sections(phantom_recon_bin_dilation, x=x_slice, y=y_slice, z=z_slice)
 
 # %%
-origin = phantom_recon_bin_erosion.flatten()
-helper.scatter_plot_values(x, y, origin, 'phantom_recon vs phantom_recon_bin_erosion', indices, xlim=xlim, ylim=ylim, figsize=figsize)
-
-origin = phantom_recon_bin_dilation.flatten()
-helper.scatter_plot_values(x, y, origin, 'phantom_recon vs phantom_recon_bin_dilation', indices, xlim=xlim, ylim=ylim, figsize=figsize)
+helper.scatter_plot(phantom_recon, phantom_recon_bin_erosion, 'phantom_recon vs phantom_recon_bin_erosion')
+helper.scatter_plot(phantom_recon, phantom_recon_bin_dilation, 'phantom_recon vs phantom_recon_bin_dilation')
 
 # %%
-phantom_recon_convolve = ndimage.convolve(phantom_recon, kern)
+phantom_recon_convolve = ndimage.convolve(phantom_recon, helper.convolve_kern(phantom_recon))
 
 lr, x_, y_ = logreg.train_logreg_model(phantom_recon, phantom_recon_convolve, phantom)
-y_predict = lr.predict(x)
-print(f'LR.coef_ { lr.coef_ }, LR.intercept_ { lr.intercept_ }, LR.classes_ { lr.classes_ }')
-print(f'classification_report { classification_report(y_, y_predict) }')
-print(f'prediction score: { lr.score(x_, y_) }')
-print(f'jaccard score: { jaccard_score(y_predict, y_) }\n')
+logreg.logreg_predict(lr, x_, y_)
 
 # %%
-coef = lr.coef_[0, :]
-x_coef = coef[1]
-y_coef = coef[0]
-intercept = lr.intercept_[0]
-x = x_[:, 1]
-y = x_[:, 0]
-
-def y_line(x0):
-    return (-(x0 * x_coef) - intercept) / y_coef
-
-xmin, xmax = x.min(), x.max()
-ymin, ymax = y_line(xmin), y_line(xmax)
-
-origin = phantom.flatten()
-helper.scatter_plot_values_with_line(x, y, origin, 'phantom_recon vs phantom', indices, xlim=xlim, ylim=ylim, figsize=figsize, xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax)
+helper.scatter_plot_with_logreg_line(phantom_recon, phantom, 'phantom_recon vs phantom', lr)
 
 # %%
-phantom_recon_filtered = ndimage.convolve(phantom_recon, kern)
-helper.get_stats(phantom_recon_filtered)
-helper.show_2d_sections(phantom_recon_filtered, x=x_slice, y=y_slice, z=z_slice)
-helper.show_histogram(phantom_recon_filtered, xmin=phantom_recon_min, xmax=phantom_recon_max, log=True)
+lr, x_, y_ = logreg.train_logreg_model(phantom_recon, phantom_recon_convolve, phantom_recon_bin_erosion)
+logreg.logreg_predict(lr, x_, y_)
+helper.scatter_plot_with_logreg_line(phantom_recon, phantom_recon_bin_erosion, 'phantom_recon vs phantom_recon_bin_erosion', lr)
 
 # %%
-x = phantom_recon_filtered.flatten()
-xlim = (np.min(x), np.max(x))
-y = ndimage.convolve(phantom_recon_filtered, kern).flatten()
-ylim = (np.min(y), np.max(y))
-origin = phantom.flatten()
-helper.scatter_plot_values(x, y, origin, 'phantom_recon_filtered vs phantom', indices, xlim=xlim, ylim=ylim)
-
-# %%
-phantom_recon_filtered_bin = helper.binarize_image(phantom_recon_filtered)
-floating_solids = helper.get_floating_solids(phantom_recon_filtered_bin)
-print(f'Floating solids: {np.sum(floating_solids)}')
-helper.show_2d_sections(phantom_recon_filtered_bin, x=x_slice, y=y_slice, z=z_slice)
-
-# %%
-origin = phantom_recon_filtered_bin.flatten()
-helper.scatter_plot_values(x, y, origin, 'phantom_recon_filtered vs phantom_recon_filtered_bin', indices, xlim=xlim, ylim=ylim)
-
-# %%
+lr, x_, y_ = logreg.train_logreg_model(phantom_recon, phantom_recon_convolve, phantom_recon_bin_dilation)
+logreg.logreg_predict(lr, x_, y_)
+helper.scatter_plot_with_logreg_line(phantom_recon, phantom_recon_bin_dilation, 'phantom_recon vs phantom_recon_bin_dilation', lr)
 
 # %%
