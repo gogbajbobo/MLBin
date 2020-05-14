@@ -5,6 +5,7 @@ from skimage import filters
 from skimage import morphology
 import porespy as ps
 from scipy import ndimage
+import levitating_stones_evaluation as lse
 
 
 def get_data_from_file(file_path, group_name, type=None):
@@ -143,7 +144,8 @@ def mod_otsu(histogram):
 
 def binarize_image(image):
 
-    result = np.copy(image)
+    result = np.copy(image).astype(np.float)
+
     result -= np.min(result)
     result /= np.max(result)
     result = (result * 255).astype(np.uint8)
@@ -157,21 +159,25 @@ def binarize_image(image):
 
     calc_porosity(result)
 
-    return result
+    return result, otsu_level
 
 
 def calc_porosity(image):
-    porosity = 1 - np.count_nonzero(image)/image.size
-    print(f'Porosity: {porosity}')
+    porosity = 1 - np.sum(image)/image.size
+    print(f'Porosity: {porosity:.2f}')
     return porosity
 
 
 def get_floating_solids(image):
-    return ps.filters.find_disconnected_voxels(image)
+    im = np.copy(image).astype(np.bool)
+    return lse.get_levitating_volume(im)
+    # return ps.filters.find_disconnected_voxels(im)
 
 
 def get_closed_pores(image):
-    return ps.filters.find_disconnected_voxels(~image)
+    im = np.copy(image).astype(np.bool)
+    return lse.get_levitating_volume(~im)
+    # return ps.filters.find_disconnected_voxels(~im)
 
 
 def fill_floating_solids_and_closed_pores(image):
