@@ -44,7 +44,7 @@ print(f'Floating solids: {np.sum(floating_solids)}')
 phantom[floating_solids] = False
 
 # %%
-phantom_recon = moe.process_image(phantom, 180, reconstruct_filter='ramp', noise_parameter=30, noise_method='poisson', projection_blurring=True)
+phantom_recon = moe.process_image(phantom, 180, reconstruct_filter='ramp', noise_parameter=30, noise_method='poisson', detector_blurring=True)
 phantom_recon_shape, phantom_recon_min, phantom_recon_max, phantom_recon_mean, phantom_recon_std = helper.get_stats(phantom_recon)
 helper.show_2d_sections(phantom_recon, x=x_slice, y=y_slice, z=z_slice)
 helper.show_histogram(phantom_recon, xmin=phantom_recon_min, xmax=phantom_recon_max, log=True)
