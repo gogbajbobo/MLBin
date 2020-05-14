@@ -11,7 +11,8 @@ def process_image(
         noise_method=None,
         reconstruct_sart=False,
         reconstruct_filter=None,
-        projection_blurring=False
+        detector_blurring=False,
+        source_blurring=False
 ):
     sim = create_sinogram(num_of_angles, image)
     print(f'sinogram shape: {sim.shape}')
@@ -22,8 +23,10 @@ def process_image(
         sim, _ = add_poisson_noise_physical(sim, nominal_intensity=noise_parameter)
     else:
         raise ValueError('unknown noise_method param')
-    if projection_blurring:
-        sim = sinogram_blurring(sim)
+    if source_blurring:
+        sim = sinogram_source_blurring(sim)
+    if detector_blurring:
+        sim = sinogram_detector_blurring(sim)
     rec = reconstruct(sim, reconstruct_sart, reconstruct_filter)
     print(f'reconstruction shape: {rec.shape}')
     return crop(rec, image.shape)
@@ -78,7 +81,7 @@ def add_poisson_noise(sinogram, intensity):
     return sinogram
 
 
-def add_poisson_noise_physical(sinogram, atten_coef=0.25, pixel_size=0.02, nominal_intensity=100, frame_count=5):
+def add_poisson_noise_physical(sinogram, atten_coef=0.25, pixel_size=0.01, nominal_intensity=100, frame_count=5):
 
     I0_empty = np.zeros(sinogram.shape)
     for i in range(frame_count):
@@ -95,11 +98,35 @@ def add_poisson_noise_physical(sinogram, atten_coef=0.25, pixel_size=0.02, nomin
     return noised_radon_sinogram, experimental_sinogram
 
 
-def sinogram_blurring(sinograms):
+def sinogram_source_blurring(sinograms):
+    _sinograms = np.copy(sinograms).astype(np.float)
+    dim = len(_sinograms.shape)
+    num_of_angles = _sinograms.shape[2] if dim == 3 else _sinograms.shape[1]
+    source_object_distance = 1  # all values in meters
+    object_detector_distance = 5e-2
+    source_size = 100e-6
+    pixel_size = 10e-6
+    source_image_size = source_size * object_detector_distance / source_object_distance
+    source_image_size_in_pixels = source_image_size / pixel_size
+    gauss_sigma = source_image_size_in_pixels / (2 * np.sqrt(2 * np.log(2)))
+    print(f'source blurring sigma: {gauss_sigma}')
+    result = np.empty_like(_sinograms)
+    for angle in np.arange(num_of_angles):
+        projection = _sinograms[:, :, angle] if dim == 3 else _sinograms[:, angle]
+        projection_dim = len(projection.shape)
+        for axis in np.arange(projection_dim):
+            output = ndimage.gaussian_filter1d(projection, gauss_sigma, axis)
+            projection = output
+        result[:, :, angle] = projection
+    return result
+
+
+def sinogram_detector_blurring(sinograms):
     _sinograms = np.copy(sinograms).astype(np.float)
     dim = len(_sinograms.shape)
     num_of_angles = _sinograms.shape[2] if dim == 3 else _sinograms.shape[1]
     gauss_sigma = 0.56
+    print(f'detector blurring sigma: {gauss_sigma}')
     result = np.empty_like(_sinograms)
     for angle in np.arange(num_of_angles):
         projection = _sinograms[:, :, angle] if dim == 3 else _sinograms[:, angle]
