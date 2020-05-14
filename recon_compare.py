@@ -55,15 +55,15 @@ phantom_recon_180_sart = moe.process_image(phantom, 180, reconstruct_sart=recons
 helper.show_2d_sections(phantom_recon_180_sart, x=x_slice, y=y_slice, z=z_slice)
 
 # %%
-phantom_recon_180_no_filter_blurring = moe.process_image(phantom, 180, projection_blurring=True)
+phantom_recon_180_no_filter_blurring = moe.process_image(phantom, 180, detector_blurring=True)
 helper.show_2d_sections(phantom_recon_180_no_filter_blurring, x=x_slice, y=y_slice, z=z_slice)
 
 reconstruct_filter='hamming'
-phantom_recon_180_hamming_blurring = moe.process_image(phantom, 180, reconstruct_filter=reconstruct_filter, projection_blurring=True)
+phantom_recon_180_hamming_blurring = moe.process_image(phantom, 180, reconstruct_filter=reconstruct_filter, detector_blurring=True)
 helper.show_2d_sections(phantom_recon_180_hamming_blurring, x=x_slice, y=y_slice, z=z_slice)
 
 reconstruct_sart=True
-phantom_recon_180_sart_blurring = moe.process_image(phantom, 180, reconstruct_sart=reconstruct_sart, projection_blurring=True)
+phantom_recon_180_sart_blurring = moe.process_image(phantom, 180, reconstruct_sart=reconstruct_sart, detector_blurring=True)
 helper.show_2d_sections(phantom_recon_180_sart_blurring, x=x_slice, y=y_slice, z=z_slice)
 
 # %%
@@ -86,16 +86,16 @@ helper.show_2d_sections(phantom_recon_180_sart_noise_30, x=x_slice, y=y_slice, z
 
 
 # %%
-phantom_recon_180_no_filter_noise_30_blurring = moe.process_image(phantom, 180, noise_parameter=noise_parameter, noise_method=noise_method, projection_blurring=True)
+phantom_recon_180_no_filter_noise_30_blurring = moe.process_image(phantom, 180, noise_parameter=noise_parameter, noise_method=noise_method, detector_blurring=True)
 helper.show_2d_sections(phantom_recon_180_no_filter_noise_30_blurring, x=x_slice, y=y_slice, z=z_slice)
 
 phantom_recon_180_hamming_noise_30_blurring = moe.process_image(
-    phantom, 180, reconstruct_filter=reconstruct_filter, noise_parameter=noise_parameter, noise_method=noise_method, projection_blurring=True
+    phantom, 180, reconstruct_filter=reconstruct_filter, noise_parameter=noise_parameter, noise_method=noise_method, detector_blurring=True
 )
 helper.show_2d_sections(phantom_recon_180_hamming_noise_30_blurring, x=x_slice, y=y_slice, z=z_slice)
 
 phantom_recon_180_sart_noise_30_blurring = moe.process_image(
-    phantom, 180, reconstruct_sart=reconstruct_sart, noise_parameter=noise_parameter, noise_method=noise_method, projection_blurring=True
+    phantom, 180, reconstruct_sart=reconstruct_sart, noise_parameter=noise_parameter, noise_method=noise_method, detector_blurring=True
 )
 helper.show_2d_sections(phantom_recon_180_sart_noise_30_blurring, x=x_slice, y=y_slice, z=z_slice)
 
