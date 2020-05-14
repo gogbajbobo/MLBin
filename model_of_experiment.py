@@ -18,7 +18,8 @@ def process_image(
     if noise_method is None:
         pass
     elif noise_method == 'poisson':
-        sim = add_poisson_noise(sim, noise_parameter)
+        # sim = add_poisson_noise(sim, noise_parameter)
+        sim, _ = add_poisson_noise_physical(sim, nominal_intensity=noise_parameter)
     else:
         raise ValueError('unknown noise_method param')
     if projection_blurring:
@@ -75,6 +76,23 @@ def add_poisson_noise(sinogram, intensity):
     sinogram = np.ceil(sinogram)
 
     return sinogram
+
+
+def add_poisson_noise_physical(sinogram, atten_coef=0.25, pixel_size=0.02, nominal_intensity=100, frame_count=5):
+
+    I0_empty = np.zeros(sinogram.shape)
+    for i in range(frame_count):
+        I0_empty += np.random.poisson(lam=nominal_intensity, size=sinogram.shape).astype('float32')
+    I0_empty /= frame_count
+
+    I0 = np.random.poisson(lam=nominal_intensity, size=sinogram.shape).astype('float32')
+    material_length = sinogram * pixel_size
+    experimental_sinogram = (I0 * np.exp(-atten_coef * material_length)).astype(int)
+    experimental_sinogram[experimental_sinogram < 1] = 1
+
+    noised_radon_sinogram = np.log(I0_empty / experimental_sinogram) / pixel_size / atten_coef
+
+    return noised_radon_sinogram, experimental_sinogram
 
 
 def sinogram_blurring(sinograms):
