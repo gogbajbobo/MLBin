@@ -25,14 +25,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # %%
-size = 100
+size = 250
 dim = 3
 shape = tuple(size for _ in range(dim))
 random_seed = 3
 number_of_angles = 180
 noise_method = 'poisson'
-source_blurring = True
-detector_blurring = False
+source_blurring = False
+detector_blurring = True
 
 x_slice = size // 2
 y_slice = size // 2
@@ -80,8 +80,8 @@ def generate_phantom(porosity, noise_parameter, threshold_levels=None):
     )
     helper.show_2d_sections(phantom_recon, x=x_slice, y=y_slice, z=z_slice)
     
-    plt.figure(figsize=(20, 20))
-    plt.imshow(phantom_recon[0, :, :], cmap='gray')
+#     plt.figure(figsize=(20, 20))
+#     plt.imshow(phantom_recon[0, :, :], cmap='gray')
 
     phantom_recon -= np.min(phantom_recon)
     phantom_recon /= np.max(phantom_recon)
@@ -89,13 +89,17 @@ def generate_phantom(porosity, noise_parameter, threshold_levels=None):
 
     phantom_recon_bin, otsu_level = helper.binarize_image(phantom_recon)
     helper.show_2d_sections(phantom_recon_bin, x=x_slice, y=y_slice, z=z_slice)
+    recon_bin_porosity = 1 - np.sum(phantom_recon_bin)/phantom_recon_bin.size
         
     show_phantoms_stats(phantom, phantom_recon, otsu_level)
 
     floating_solids = helper.get_floating_solids(phantom_recon_bin)
     closed_pores = helper.get_closed_pores(phantom_recon_bin)
-    print(f'Floating solids: {np.sum(floating_solids)}')
-    print(f'Closed pores: {np.sum(closed_pores)}')
+    floating_solids_count = np.sum(floating_solids)
+    closed_pores_count = np.sum(closed_pores)
+    
+    print(f'Floating solids: {floating_solids_count}')
+    print(f'Closed pores: {closed_pores_count}')
     print('\n')
     
     if threshold_levels is not None:
@@ -112,20 +116,39 @@ def generate_phantom(porosity, noise_parameter, threshold_levels=None):
             print('\n')
     
     plt.show()
+    return recon_bin_porosity, floating_solids_count, closed_pores_count
 
 
 # porosities = [0.1, 0.3, 0.5, 0.7, 0.9]
 # intensities = [10, 30, 100, 300, 1000]
+# threshold_levels = None
 
 porosities = [0.3]
-intensities = [1000]
-# threshold_levels = np.arange(120, 140, 2)
-threshold_levels = None
+intensities = [30]
+threshold_levels = np.arange(100, 152, 2)
 
+porosities_array = np.array([])
+intensities_array = np.array([])
+binarized_porosities_array = np.array([])
+floating_solids_count_array = np.array([])
+closed_pores_count_array = np.array([])
 
 for p in porosities:
     for i in intensities:
-        generate_phantom(p, i, threshold_levels)
+        recon_bin_porosity, floating_solids_count, closed_pores_count = generate_phantom(p, i, threshold_levels)
+        porosities_array = np.append(porosities_array, p)
+        intensities_array = np.append(intensities_array, i)
+        binarized_porosities_array = np.append(binarized_porosities_array, recon_bin_porosity)
+        floating_solids_count_array = np.append(floating_solids_count_array, floating_solids_count)
+        closed_pores_count_array = np.append(closed_pores_count_array, closed_pores_count)
+
+data = np.array((porosities_array, intensities_array, binarized_porosities_array, floating_solids_count_array, closed_pores_count_array))
+data = np.transpose(data)
+np.savetxt(
+    'floating_stones_evaluation.csv', 
+    data, 
+    delimiter=','
+)
 
 
 # %%
