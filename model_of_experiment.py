@@ -10,7 +10,7 @@ def process_image(
         noise_parameter=0,
         noise_method=None,
         reconstruct_sart=False,
-        reconstruct_filter=None,
+        reconstruct_filter='ramp',
         detector_blurring=False,
         source_blurring=False
 ):
@@ -20,13 +20,13 @@ def process_image(
         pass
     elif noise_method == 'poisson':
         # sim = add_poisson_noise(sim, noise_parameter)
-        sim, _ = add_poisson_noise_physical(sim, nominal_intensity=noise_parameter)
+        sim, _ = add_poisson_noise_physical(sim, nominal_intensity=noise_parameter, detector_blurring=detector_blurring)
     else:
         raise ValueError('unknown noise_method param')
-    if source_blurring:
-        sim = sinogram_source_blurring(sim)
-    if detector_blurring:
-        sim = sinogram_detector_blurring(sim)
+    # if source_blurring:
+    #     sim = sinogram_source_blurring(sim)
+    # if detector_blurring:
+    #     sim = sinogram_detector_blurring(sim)
     rec = reconstruct(sim, reconstruct_sart, reconstruct_filter)
     print(f'reconstruction shape: {rec.shape}')
     return crop(rec, image.shape)
@@ -81,7 +81,9 @@ def add_poisson_noise(sinogram, intensity):
     return sinogram
 
 
-def add_poisson_noise_physical(sinogram, atten_coef=0.25, pixel_size=0.01, nominal_intensity=100, frame_count=5):
+def add_poisson_noise_physical(
+        sinogram, atten_coef=0.25, pixel_size=0.02, nominal_intensity=100, frame_count=5, detector_blurring=False
+):
 
     I0_empty = np.zeros(sinogram.shape)
     for i in range(frame_count):
@@ -91,6 +93,8 @@ def add_poisson_noise_physical(sinogram, atten_coef=0.25, pixel_size=0.01, nomin
     I0 = np.random.poisson(lam=nominal_intensity, size=sinogram.shape).astype('float32')
     material_length = sinogram * pixel_size
     experimental_sinogram = (I0 * np.exp(-atten_coef * material_length)).astype(int)
+    if detector_blurring:
+        experimental_sinogram = sinogram_detector_blurring(experimental_sinogram)
     experimental_sinogram[experimental_sinogram < 1] = 1
 
     noised_radon_sinogram = np.log(I0_empty / experimental_sinogram) / pixel_size / atten_coef
