@@ -43,16 +43,8 @@ z_slice = size // 2
 helper.show_2d_sections(phantom, x=x_slice, y=y_slice, z=z_slice)
 
 # %%
-phantom_recon_180_no_filter = moe.process_image(phantom, 180)
-helper.show_2d_sections(phantom_recon_180_no_filter, x=x_slice, y=y_slice, z=z_slice)
-
-reconstruct_filter='hamming'
-phantom_recon_180_hamming = moe.process_image(phantom, 180, reconstruct_filter=reconstruct_filter)
-helper.show_2d_sections(phantom_recon_180_hamming, x=x_slice, y=y_slice, z=z_slice)
-
-reconstruct_sart=True
-phantom_recon_180_sart = moe.process_image(phantom, 180, reconstruct_sart=reconstruct_sart)
-helper.show_2d_sections(phantom_recon_180_sart, x=x_slice, y=y_slice, z=z_slice)
+phantom_recon_180 = moe.process_image(phantom, 180)
+helper.show_2d_sections(phantom_recon_180, x=x_slice, y=y_slice, z=z_slice)
 
 # %%
 phantom_recon_180_no_filter_blurring = moe.process_image(phantom, 180, detector_blurring=True)
