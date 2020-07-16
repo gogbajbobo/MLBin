@@ -42,12 +42,12 @@ file_to_save = h5py.File(f'{file_dir}sample_int.h5', mode='w')
 file_to_save.create_dataset('Reconstruction', data=data_int, compression='lzf')
 
 # %% id="Tlan_ddGy4JE" colab_type="code" colab={"base_uri": "https://localhost:8080/", "height": 611} outputId="0b4c5713-3ff9-4a19-8bef-fafe347e9325"
-plt.figure(figsize=(10, 10))
+plt.figure(figsize=(5, 5))
 plt.imshow(data_int[:, :, 0])
 
 # %%
 data_bin, _ = helper.binarize_image(data_int)
-plt.figure(figsize=(10, 10))
+plt.figure(figsize=(5, 5))
 plt.imshow(data_bin[:, :, 0])
 
 # %%
@@ -62,13 +62,13 @@ plt.imshow(data_bin_dilation[:, :, 0])
 # %%
 data_stones = np.copy(data_int)
 data_stones[data_bin_erosion == False] = 0
-plt.figure(figsize=(10, 10))
+plt.figure(figsize=(5, 5))
 plt.imshow(data_stones[:, :, 0])
 
 # %%
 data_pores = np.copy(data_int)
 data_pores[data_bin_dilation == True] = 255
-plt.figure(figsize=(10, 10))
+plt.figure(figsize=(5, 5))
 plt.imshow(data_pores[:, :, 0])
 
 # %% id="_9w49PKE0DmQ" colab_type="code" colab={}
@@ -78,7 +78,7 @@ for i in np.arange(250):
   result += skimf.greycomatrix(data_int[:, :, i], [1], [0], symmetric=True)[:, :, 0, 0]
 
 # %% id="0Yw8aEgK2OrU" colab_type="code" colab={"base_uri": "https://localhost:8080/", "height": 611} outputId="c23599f2-9c4d-4dcc-d38d-d9f9aa10f43f"
-plt.figure(figsize=(10, 10))
+plt.figure(figsize=(5, 5))
 plt.imshow(result)
 
 # %% id="wgheTDjO37Yf" colab_type="code" colab={"base_uri": "https://localhost:8080/", "height": 1000} outputId="e7fc9fb6-f714-4112-f8a2-98a7dedc5692"
@@ -86,7 +86,7 @@ plt.imshow(result)
 #   print(i, np.sum(result[i, :]), np.sum(result[:, i]))
 
 # %% id="nuUhzQ-J64Ms" colab_type="code" colab={"base_uri": "https://localhost:8080/", "height": 609} outputId="d096b4c3-138f-4aab-e22f-78f9667597fa"
-plt.figure(figsize=(10, 10))
+plt.figure(figsize=(10, 5))
 plt.yscale('log')
 plt.plot(result[114, :])
 
@@ -100,7 +100,7 @@ for i in np.arange(256):
 #   print(i, hist_dist.mean(), hist_dist.std())
 
 # %% id="oHA7VhLkAUAN" colab_type="code" colab={"base_uri": "https://localhost:8080/", "height": 609} outputId="fc654f3f-90a7-46d3-d941-9fbbad3ebf88"
-plt.figure(figsize=(10, 10))
+plt.figure(figsize=(10, 5))
 plt.plot(stds)
 
 # %%
@@ -109,7 +109,7 @@ result_stones = np.zeros((255, 255))
 for i in np.arange(250):
   result_stones += skimf.greycomatrix(data_stones[:, :, i], [1], [0], symmetric=True)[1:, 1:, 0, 0]
 
-plt.figure(figsize=(10, 10))
+plt.figure(figsize=(5, 5))
 plt.imshow(result_stones)
 
 # %%
@@ -118,7 +118,7 @@ result_pores = np.zeros((255, 255))
 for i in np.arange(250):
   result_pores += skimf.greycomatrix(data_pores[:, :, i], [1], [0], symmetric=True)[:255, :255, 0, 0]
 
-plt.figure(figsize=(10, 10))
+plt.figure(figsize=(5, 5))
 plt.imshow(result_pores)
 
 
