@@ -127,33 +127,48 @@ a = np.array(
 
 
 # %%
-def h_glcm(arr, levels=255, symmetric=True, normed=True):
-    h_glcm = np.zeros((levels, levels))
+def h_glcm(arr, levels=256, symmetric=True, normed=True, cut=None):
+    size = levels-1 if cut in ['start', 'end'] else levels
+    h_glcm = np.zeros((size, size))
     for i in np.arange(arr.shape[0]):
         _a = arr[i, :, :]
-        h_glcm += skimf.greycomatrix(_a, [1], [0], levels=levels, symmetric=symmetric, normed=normed)[:, :, 0, 0]
+        _glcm = skimf.greycomatrix(_a, [1], [0], levels=levels, symmetric=symmetric, normed=normed)
+        _glcm = _glcm[:, :, 0, 0]
+        h_glcm += _glcm[1:, 1:] if cut == 'start' else _glcm[:size, :size] if cut == 'end' else _glcm
     return h_glcm
 
-def v_glcm(arr, levels=255, symmetric=True, normed=True):
-    v_glcm = np.zeros((levels, levels))
+def v_glcm(arr, levels=256, symmetric=True, normed=True, cut=None):
+    size = levels-1 if cut in ['start', 'end'] else levels
+    v_glcm = np.zeros((size, size))
     for i in np.arange(arr.shape[1]):
         _a = arr[:, i, :].T
-        v_glcm += skimf.greycomatrix(_a, [1], [0], levels=levels, symmetric=symmetric, normed=normed)[:, :, 0, 0]
+        _glcm = skimf.greycomatrix(_a, [1], [0], levels=levels, symmetric=symmetric, normed=normed)
+        _glcm = _glcm[:, :, 0, 0]
+        v_glcm += _glcm[1:, 1:] if cut == 'start' else _glcm[:size, :size] if cut == 'end' else _glcm
     return v_glcm
 
-def d_glcm(arr, levels=255, symmetric=True, normed=True):
-    d_glcm = np.zeros((levels, levels))
+def d_glcm(arr, levels=256, symmetric=True, normed=True, cut=None):
+    size = levels-1 if cut in ['start', 'end'] else levels
+    d_glcm = np.zeros((size, size))
     for i in np.arange(arr.shape[2]):
         _a = arr[:, :, i]
-        d_glcm += skimf.greycomatrix(_a, [1], [0], levels=levels, symmetric=symmetric, normed=normed)[:, :, 0, 0]
+        _glcm = skimf.greycomatrix(_a, [1], [0], levels=levels, symmetric=symmetric, normed=normed)
+        _glcm = _glcm[:, :, 0, 0]
+        d_glcm += _glcm[1:, 1:] if cut == 'start' else _glcm[:size, :size] if cut == 'end' else _glcm
     return d_glcm
 
-def get_glcm(arr, levels=255, symmetric=True, normed=True):
-    kwargs = {'levels': levels, 'symmetric': symmetric, 'normed': normed}
+def get_glcm(arr, levels=256, symmetric=True, normed=True, cut=None):
+    kwargs = {'levels': levels, 'symmetric': symmetric, 'normed': normed, 'cut': cut}
     return h_glcm(arr, **kwargs), v_glcm(arr, **kwargs), d_glcm(arr, **kwargs)
 
 
 # %%
 get_glcm(a, levels=3)
+
+# %%
+get_glcm(data_stones, cut='start')
+
+# %%
+get_glcm(data_pores, cut='end')
 
 # %%
