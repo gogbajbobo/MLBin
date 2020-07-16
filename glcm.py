@@ -122,35 +122,40 @@ plt.imshow(result_pores)
 
 
 # %%
-def h_glcm(arr, levels=256, symmetric=True, normed=True, cut=None):
+def handle_glcm(image, levels=256, symmetric=True, cut=None):
+    _glcm = skimf.greycomatrix(image, [1], [0], levels=levels, symmetric=symmetric)
+    _glcm = _glcm[:, :, 0, 0]
+    _glcm = _glcm[1:, 1:] if cut == 'start' else _glcm[:size, :size] if cut == 'end' else _glcm
+    return _glcm
+    
+def sum_norm(glcm):
+    glcm -= np.min(glcm)
+    glcm /= np.sum(glcm)
+    return glcm
+
+def calc_glcm(arr, levels=256, symmetric=True, normed=True, cut=None, type='h'):
     size = levels-1 if cut in ['start', 'end'] else levels
-    h_glcm = np.zeros((size, size))
+    glcm = np.zeros((size, size))
     for i in np.arange(arr.shape[0]):
-        _a = arr[i, :, :]
-        _glcm = skimf.greycomatrix(_a, [1], [0], levels=levels, symmetric=symmetric, normed=normed)
-        _glcm = _glcm[:, :, 0, 0]
-        h_glcm += _glcm[1:, 1:] if cut == 'start' else _glcm[:size, :size] if cut == 'end' else _glcm
-    return h_glcm
+        if type == 'h':
+            _a = arr[i, :, :]
+        elif type == 'v':
+            _a = arr[:, i, :].T 
+        elif type == 'd':
+            _a = arr[:, :, i]
+        else:
+            ValueError('incorrect type')
+        glcm += handle_glcm(_a, levels=levels, symmetric=symmetric, cut=cut)
+    return sum_norm(glcm) if normed else glcm
 
-def v_glcm(arr, levels=256, symmetric=True, normed=True, cut=None):
-    size = levels-1 if cut in ['start', 'end'] else levels
-    v_glcm = np.zeros((size, size))
-    for i in np.arange(arr.shape[1]):
-        _a = arr[:, i, :].T
-        _glcm = skimf.greycomatrix(_a, [1], [0], levels=levels, symmetric=symmetric, normed=normed)
-        _glcm = _glcm[:, :, 0, 0]
-        v_glcm += _glcm[1:, 1:] if cut == 'start' else _glcm[:size, :size] if cut == 'end' else _glcm
-    return v_glcm
+def h_glcm(arr, **kwargs):
+    return calc_glcm(arr, **kwargs, type='h')
 
-def d_glcm(arr, levels=256, symmetric=True, normed=True, cut=None):
-    size = levels-1 if cut in ['start', 'end'] else levels
-    d_glcm = np.zeros((size, size))
-    for i in np.arange(arr.shape[2]):
-        _a = arr[:, :, i]
-        _glcm = skimf.greycomatrix(_a, [1], [0], levels=levels, symmetric=symmetric, normed=normed)
-        _glcm = _glcm[:, :, 0, 0]
-        d_glcm += _glcm[1:, 1:] if cut == 'start' else _glcm[:size, :size] if cut == 'end' else _glcm
-    return d_glcm
+def v_glcm(arr, **kwargs):
+    return calc_glcm(arr, **kwargs, type='v')
+
+def d_glcm(arr, **kwargs):
+    return calc_glcm(arr, **kwargs, type='d')
 
 def get_glcm(arr, levels=256, symmetric=True, normed=True, cut=None):
     kwargs = {'levels': levels, 'symmetric': symmetric, 'normed': normed, 'cut': cut}
@@ -166,7 +171,7 @@ a = np.array(
 get_glcm(a, levels=3)
 
 # %%
-hcm, vcm, dcm = get_glcm(data_stones, cut='start')
+hcm, vcm, dcm = get_glcm(data_stones, normed=True, cut='start')
 fig, axes = plt.subplots(1, 3, figsize=(15, 5))
 axes[0].imshow(hcm)
 axes[1].imshow(vcm)
