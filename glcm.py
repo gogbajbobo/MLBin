@@ -171,6 +171,12 @@ axes[2].imshow(dcm)
 
 
 # %%
-get_glcm(data_pores, cut='end')
+def calc_euclidian_distance(x, y):
+    return np.sqrt(np.sum(np.power((x - y), 2)))
+
+hv_diff = calc_euclidian_distance(hcm, vcm)
+hd_diff = calc_euclidian_distance(hcm, dcm)
+vd_diff = calc_euclidian_distance(vcm, dcm)
+print(hv_diff, hd_diff, vd_diff)
 
 # %%
