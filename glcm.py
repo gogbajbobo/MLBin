@@ -52,12 +52,11 @@ plt.imshow(data_bin[:, :, 0])
 
 # %%
 data_bin_erosion = helper.erosion(data_bin)
-plt.figure(figsize=(10, 10))
-plt.imshow(data_bin_erosion[:, :, 0])
-
 data_bin_dilation = helper.dilation(data_bin)
-plt.figure(figsize=(10, 10))
-plt.imshow(data_bin_dilation[:, :, 0])
+
+fig, axes = plt.subplots(1, 2, figsize=(10, 5))
+axes[0].imshow(data_bin_erosion[:, :, 0])
+axes[1].imshow(data_bin_dilation[:, :, 0])
 
 # %%
 data_stones = np.copy(data_int)
