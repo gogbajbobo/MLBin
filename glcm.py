@@ -118,3 +118,42 @@ plt.figure(figsize=(10, 10))
 plt.imshow(result_pores)
 
 # %%
+a = np.array(
+    [[[0, 0],
+      [0, 0]],
+     
+     [[2, 2],
+      [1, 1]]]).astype(np.uint8)
+
+
+# %%
+def h_glcm(arr, levels=255, symmetric=True, normed=True):
+    h_glcm = np.zeros((levels, levels))
+    for i in np.arange(arr.shape[0]):
+        _a = arr[i, :, :]
+        h_glcm += skimf.greycomatrix(_a, [1], [0], levels=levels, symmetric=symmetric, normed=normed)[:, :, 0, 0]
+    return h_glcm
+
+def v_glcm(arr, levels=255, symmetric=True, normed=True):
+    v_glcm = np.zeros((levels, levels))
+    for i in np.arange(arr.shape[1]):
+        _a = arr[:, i, :].T
+        v_glcm += skimf.greycomatrix(_a, [1], [0], levels=levels, symmetric=symmetric, normed=normed)[:, :, 0, 0]
+    return v_glcm
+
+def d_glcm(arr, levels=255, symmetric=True, normed=True):
+    d_glcm = np.zeros((levels, levels))
+    for i in np.arange(arr.shape[2]):
+        _a = arr[:, :, i]
+        d_glcm += skimf.greycomatrix(_a, [1], [0], levels=levels, symmetric=symmetric, normed=normed)[:, :, 0, 0]
+    return d_glcm
+
+def get_glcm(arr, levels=255, symmetric=True, normed=True):
+    kwargs = {'levels': levels, 'symmetric': symmetric, 'normed': normed}
+    return h_glcm(arr, **kwargs), v_glcm(arr, **kwargs), d_glcm(arr, **kwargs)
+
+
+# %%
+get_glcm(a, levels=3)
+
+# %%
