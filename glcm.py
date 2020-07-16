@@ -14,6 +14,10 @@
 # ---
 
 # %% id="qTvP5IEis3BU" colab_type="code" colab={}
+# %load_ext autoreload
+# %autoreload 2
+
+# %%
 import h5py
 import numpy as np
 import matplotlib.pyplot as plt
