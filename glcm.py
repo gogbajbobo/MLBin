@@ -188,3 +188,24 @@ vd_diff = calc_euclidian_distance(vcm, dcm)
 print(hv_diff, hd_diff, vd_diff)
 
 # %%
+stones_hist, bins = np.histogram(data_stones, bins=255)
+stones_hist[0] = 0
+
+# %%
+helper.plot_bars(stones_hist, bins, log=True)
+
+# %%
+stones_pdf = stones_hist / np.sum(stones_hist)
+helper.plot_bars(stones_pdf, bins, log=True)
+
+# %%
+stones_pdf_test = np.random.choice(255, size=250*250, p=stones_pdf)
+plt.hist(stones_pdf_test, bins=256, log=True)
+plt.xlim(0, 255)
+
+# %%
+stones_pdf_image = stones_pdf_test.reshape((250, 250))
+plt.figure(figsize=(5, 5))
+plt.imshow(stones_pdf_image, vmin=0, vmax=255)
+
+# %%
