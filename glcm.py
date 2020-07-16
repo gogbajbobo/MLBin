@@ -163,7 +163,12 @@ a = np.array(
 get_glcm(a, levels=3)
 
 # %%
-get_glcm(data_stones, cut='start')
+hcm, vcm, dcm = get_glcm(data_stones, cut='start')
+fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+axes[0].imshow(hcm)
+axes[1].imshow(vcm)
+axes[2].imshow(dcm)
+
 
 # %%
 get_glcm(data_pores, cut='end')
