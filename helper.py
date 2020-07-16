@@ -70,9 +70,9 @@ def show_histogram_with_vline(image, vlines, xmin=None, xmax=None, log=False):
             _plt.axvline(x=vline, color='blue')
 
 
-def plot_bars(data, edges):
+def plot_bars(data, edges, log=False):
     plt.figure(figsize=(15, 5))
-    plt.bar(edges[:-1], data, width=np.diff(edges), edgecolor="black", align="edge")
+    plt.bar(edges[:-1], data, width=np.diff(edges), edgecolor="black", align="edge", log=log)
 
 
 def show_2d_image(image, fig, axis, vmin, vmax, title):
