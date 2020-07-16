@@ -117,14 +117,6 @@ for i in np.arange(250):
 plt.figure(figsize=(10, 10))
 plt.imshow(result_pores)
 
-# %%
-a = np.array(
-    [[[0, 0],
-      [0, 0]],
-     
-     [[2, 2],
-      [1, 1]]]).astype(np.uint8)
-
 
 # %%
 def h_glcm(arr, levels=256, symmetric=True, normed=True, cut=None):
@@ -163,6 +155,11 @@ def get_glcm(arr, levels=256, symmetric=True, normed=True, cut=None):
 
 
 # %%
+a = np.array(
+    [[[0, 0],
+      [0, 0]],
+     [[2, 2],
+      [1, 1]]])
 get_glcm(a, levels=3)
 
 # %%
