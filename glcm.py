@@ -136,7 +136,8 @@ def sum_norm(glcm):
 def calc_glcm(arr, levels=256, symmetric=True, normed=True, cut=None, type='h'):
     size = levels-1 if cut in ['start', 'end'] else levels
     glcm = np.zeros((size, size))
-    for i in np.arange(arr.shape[0]):
+    axis = 0 if type == 'h' else 1 if type == 'v' else 2 if type == 'd' else ValueError('incorrect type')
+    for i in np.arange(arr.shape[axis]):
         if type == 'h':
             _a = arr[i, :, :]
         elif type == 'v':
