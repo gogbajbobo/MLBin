@@ -208,13 +208,34 @@ stones_pdf = stones_hist / np.sum(stones_hist)
 helper.plot_bars(stones_pdf, bins, log=True)
 
 # %%
-stones_pdf_test = np.random.choice(255, size=250*250, p=stones_pdf)
+# %%time
+stones_pdf_test = np.random.choice(255, size=250*250*2, p=stones_pdf)
 plt.hist(stones_pdf_test, bins=256, log=True)
 plt.xlim(0, 255)
 
 # %%
-stones_pdf_image = stones_pdf_test.reshape((250, 250))
+stones_pdf_image = stones_pdf_test.reshape((250, 250, 2))
 plt.figure(figsize=(5, 5))
-plt.imshow(stones_pdf_image, vmin=0, vmax=255)
+plt.imshow(stones_pdf_image[:, :, 0], vmin=0, vmax=255)
+
+# %%
+hcm_g, vcm_g, dcm_g = get_glcm(stones_pdf_image, normed=True, cut='start')
+fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+axes[0].imshow(hcm_g)
+axes[1].imshow(vcm_g)
+axes[2].imshow(dcm_g)
+
+# %%
+h_diff = calc_euclidian_distance(hcm, hcm_g)
+v_diff = calc_euclidian_distance(vcm, vcm_g)
+d_diff = calc_euclidian_distance(dcm, dcm_g)
+print(h_diff, v_diff, d_diff)
+
+origin_glcm = hcm + vcm + dcm
+generated_glcm = hcm_g + vcm_g + dcm_g
+print(calc_euclidian_distance(origin_glcm, generated_glcm))
+fig, axes = plt.subplots(1, 2, figsize=(15, 5))
+axes[0].imshow(origin_glcm)
+axes[1].imshow(generated_glcm)
 
 # %%
