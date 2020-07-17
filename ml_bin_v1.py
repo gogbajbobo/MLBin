@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.4.2
+#       jupytext_version: 1.5.1
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -215,7 +215,7 @@ helper.show_histogram(sample, log=True)
 helper.show_histogram(phantom_with_noise, log=True)
 
 # %%
-phantom_with_noise_binarized = helper.binarize_image(phantom_with_noise)
+phantom_with_noise_binarized, _ = helper.binarize_image(phantom_with_noise)
 
 # %%
 phantom_with_noise_binarized_filled = helper.fill_floating_solids_and_closed_pores(phantom_with_noise_binarized)

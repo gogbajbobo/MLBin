@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.4.2
+#       jupytext_version: 1.5.1
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -53,7 +53,7 @@ helper.show_histogram(phantom_recon, xmin=phantom_recon_min, xmax=phantom_recon_
 helper.scatter_plot(phantom_recon, phantom, 'phantom_recon vs phantom')
 
 # %%
-phantom_recon_bin = helper.binarize_image(phantom_recon)
+phantom_recon_bin, _ = helper.binarize_image(phantom_recon)
 floating_solids = helper.get_floating_solids(phantom_recon_bin)
 print(f'Floating solids: {np.sum(floating_solids)}')
 # helper.show_2d_sections(phantom_recon_bin, x=x_slice, y=y_slice, z=z_slice)
