@@ -168,8 +168,16 @@ a = np.array(
     [[[0, 0],
       [0, 0]],
      [[2, 2],
-      [1, 1]]])
-get_glcm(a, levels=3)
+      [1, 0]]])
+
+print(f'z0\n{a[0, :, :]}')
+print(f'y0\n{a[:, 0, :]}')
+print(f'x0\n{a[:, :, 0]}')
+
+h, v, d = get_glcm(a, levels=3, normed=False, symmetric=False)
+print(f'h\n{h}')
+print(f'v\n{v}')
+print(f'd\n{d}')
 
 # %%
 hcm, vcm, dcm = get_glcm(data_stones, normed=True, cut='start')
