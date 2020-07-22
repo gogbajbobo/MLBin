@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.5.1
+#       jupytext_version: 1.5.2
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -237,5 +237,31 @@ print(calc_euclidian_distance(origin_glcm, generated_glcm))
 fig, axes = plt.subplots(1, 2, figsize=(15, 5))
 axes[0].imshow(origin_glcm)
 axes[1].imshow(generated_glcm)
+
+
+# %%
+def get_props_of_glcm(glcm):
+    _glcm = np.copy(glcm)[..., np.newaxis, np.newaxis]
+    contrast = skimf.greycoprops(_glcm, 'contrast')
+    dissimilarity = skimf.greycoprops(_glcm, 'dissimilarity')
+    homogeneity = skimf.greycoprops(_glcm, 'homogeneity')
+    energy = skimf.greycoprops(_glcm, 'energy')
+    correlation = skimf.greycoprops(_glcm, 'correlation')
+    asm = skimf.greycoprops(_glcm, 'ASM')
+    print('---- glcm props ----')
+    print(f'contrast: {contrast}')
+    print(f'dissimilarity: {dissimilarity}')
+    print(f'homogeneity: {homogeneity}')
+    print(f'energy: {energy}')
+    print(f'cocorrelationntrast: {correlation}')
+    print(f'asm: {asm}')
+    print('\n')
+    return np.array([contrast, dissimilarity, homogeneity, energy, correlation, asm])
+
+
+# %%
+origin_glcm_props = get_props_of_glcm(origin_glcm)
+generated_glcm_props = get_props_of_glcm(generated_glcm)
+origin_glcm_props - generated_glcm_props
 
 # %%
