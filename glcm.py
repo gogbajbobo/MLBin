@@ -122,7 +122,7 @@ plt.imshow(result_pores)
 
 
 # %%
-def handle_glcm(image, levels=256, symmetric=True, cut=None):
+def handle_glcm(image, levels=256, symmetric=True, cut=None, size=256):
     _glcm = skimf.greycomatrix(image, [1], [0], levels=levels, symmetric=symmetric)
     _glcm = _glcm[:, :, 0, 0]
     _glcm = _glcm[1:, 1:] if cut == 'start' else _glcm[:size, :size] if cut == 'end' else _glcm
@@ -146,7 +146,7 @@ def calc_glcm(arr, levels=256, symmetric=True, normed=True, cut=None, type='h'):
             _a = arr[:, :, i]
         else:
             ValueError('incorrect type')
-        glcm += handle_glcm(_a, levels=levels, symmetric=symmetric, cut=cut)
+        glcm += handle_glcm(_a, levels=levels, symmetric=symmetric, cut=cut, size=size)
     return sum_norm(glcm) if normed else glcm
 
 def h_glcm(arr, **kwargs):
