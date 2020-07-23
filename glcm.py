@@ -265,3 +265,89 @@ generated_glcm_props = get_props_of_glcm(generated_glcm)
 origin_glcm_props - generated_glcm_props
 
 # %%
+object_image = data_int[:, :, 0]
+stones_image = data_stones[:, :, 0]
+pores_image = data_pores[:, :, 0]
+
+fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+axes[0].imshow(object_image)
+axes[1].imshow(stones_image)
+axes[2].imshow(pores_image)
+
+# %%
+h, _, _ = get_glcm(object_image[np.newaxis, ...], normed=True)
+hs, _, _ = get_glcm(stones_image[np.newaxis, ...], normed=True, cut='start')
+hp, _, _ = get_glcm(pores_image[np.newaxis, ...], normed=True, cut='end')
+
+fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+axes[0].imshow(h)
+axes[1].imshow(hs)
+axes[2].imshow(hp)
+
+# %%
+object_hist, bins = np.histogram(object_image, bins=255, range=(0, 255))
+helper.plot_bars(object_hist, bins, log=True)
+
+stones_hist, bins = np.histogram(stones_image, bins=255, range=(0, 255))
+stones_hist[0] = 0
+helper.plot_bars(stones_hist, bins, log=True)
+
+pores_hist, bins = np.histogram(pores_image, bins=255, range=(0, 255))
+pores_hist[-1] = 0
+helper.plot_bars(pores_hist, bins, log=True)
+
+sum_hist = stones_hist + pores_hist
+helper.plot_bars(sum_hist, bins, log=True)
+
+diff_hist = object_hist - sum_hist
+helper.plot_bars(diff_hist, bins, log=True)
+
+# %%
+stones_pdf = stones_hist / np.sum(stones_hist)
+pores_pdf = pores_hist / np.sum(pores_hist)
+
+# %%
+# %%time
+stones_pdf_data = np.random.choice(255, size=250*250, p=stones_pdf)
+plt.hist(stones_pdf_data, bins=256, log=True)
+plt.xlim(0, 255)
+
+pores_pdf_data = np.random.choice(255, size=250*250, p=pores_pdf)
+plt.hist(pores_pdf_data, bins=256, log=True)
+plt.xlim(0, 255)
+
+# %%
+stones_pdf_image = stones_pdf_data.reshape((250, 250))
+pores_pdf_image = pores_pdf_data.reshape((250, 250))
+
+fig, axes = plt.subplots(1, 2, figsize=(10, 5))
+axes[0].imshow(stones_pdf_image, vmin=0, vmax=255)
+axes[1].imshow(pores_pdf_image, vmin=0, vmax=255)
+
+# %%
+hsg, _, _ = get_glcm(stones_pdf_image[np.newaxis, ...], normed=True, cut='start')
+hpg, _, _ = get_glcm(pores_pdf_image[np.newaxis, ...], normed=True, cut='end')
+
+fig, axes = plt.subplots(1, 2, figsize=(10, 5))
+axes[0].imshow(hs)
+axes[1].imshow(hp)
+
+fig, axes = plt.subplots(1, 2, figsize=(10, 5))
+axes[0].imshow(hsg)
+axes[1].imshow(hpg)
+
+fig, axes = plt.subplots(1, 2, figsize=(10, 5))
+axes[0].imshow(hs-hsg)
+axes[1].imshow(hp-hpg)
+
+abs_diff_hs = np.absolute(hs-hsg)
+abs_diff_hp = np.absolute(hp-hpg)
+fig, axes = plt.subplots(1, 2, figsize=(10, 5))
+axes[0].imshow(abs_diff_hs)
+axes[1].imshow(abs_diff_hp)
+
+# %%
+print(np.unravel_index(np.argmax(abs_diff_hs), abs_diff_hs.shape))
+print(np.unravel_index(np.argmax(abs_diff_hp), abs_diff_hp.shape))
+
+# %%
