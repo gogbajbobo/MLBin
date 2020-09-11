@@ -4,7 +4,6 @@ h5py
 matplotlib
 scikit-image
 numpy
-porespy
 scipy
 opencv-python
 scikit-learn

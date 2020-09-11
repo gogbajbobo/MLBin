@@ -3,7 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from skimage import filters
 from skimage import morphology
-import porespy as ps
 from scipy import ndimage
 import levitating_stones_evaluation as lse
 
@@ -171,13 +170,11 @@ def calc_porosity(image):
 def get_floating_solids(image):
     im = np.copy(image).astype(np.bool)
     return lse.get_levitating_volume(im)
-    # return ps.filters.find_disconnected_voxels(im)
 
 
 def get_closed_pores(image):
     im = np.copy(image).astype(np.bool)
     return lse.get_levitating_volume(~im)
-    # return ps.filters.find_disconnected_voxels(~im)
 
 
 def fill_floating_solids_and_closed_pores(image):
