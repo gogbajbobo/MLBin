@@ -218,7 +218,9 @@ def get_lengths_stats(bin_image, axis):
 def get_stripe(image, axis, i ,j):
     if 0 > axis > 2:
         raise ValueError('incorrect value of axis')
-    return np.copy(image[:, i, j]) if axis == 0 else np.copy(image[i, :, j]) if axis == 1 else np.copy(image[i, j, :])
+    return np.copy(image[:, i, j]) if axis == 0 \
+        else np.copy(image[i, :, j]) if axis == 1 \
+        else np.copy(image[i, j, :])
 
 
 def convolve_kern(image):
