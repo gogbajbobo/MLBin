@@ -350,4 +350,70 @@ axes[1].imshow(abs_diff_hp)
 print(np.unravel_index(np.argmax(abs_diff_hs), abs_diff_hs.shape))
 print(np.unravel_index(np.argmax(abs_diff_hp), abs_diff_hp.shape))
 
+
+# %%
+def plot_glcms(glcm, glcmg, diff, generated_image):
+    fig, axes = plt.subplots(1, 4, figsize=(20, 5))
+    axes[0].imshow(glcm)
+    axes[1].imshow(glcmg)
+    axes[2].imshow(diff)
+    axes[3].imshow(generated_image, vmin=0, vmax=255)
+    print(np.unravel_index(np.argmax(diff), diff.shape))
+    
+plot_glcms(hs, hsg, abs_diff_hs, stones_pdf_image)
+
+# %%
+rx1, rx2, ry1, ry2 = np.random.randint(0, 250, 4)
+stones_pdf_image[rx1, ry1]
+stones_pdf_image[rx2, ry2]
+
+# %%
+test_image = np.copy(stones_pdf_image)
+hs, _, _ = get_glcm(stones_image[np.newaxis, ...], normed=True, cut='start')
+hsg, _, _ = get_glcm(test_image[np.newaxis, ...], normed=True, cut='start')
+abs_diff_hs = np.absolute(hs-hsg)
+err = np.sqrt(np.sum(abs_diff_hs ** 2))
+success_count = 0
+unsuccess_count = 0
+print(f'initial error: {err}')
+
+for i in range(1000):
+    
+#     max_diff_value, _ = np.unravel_index(np.argmax(abs_diff_hs), abs_diff_hs.shape)
+#     result = np.where(stones_pdf_image == max_diff_value)
+#     listOfCoordinates = list(zip(result[0], result[1]))
+#     max_value_coord = listOfCoordinates[0]
+
+    coord1 = np.random.randint(0, 250, 2)
+    coord2 = np.random.randint(0, 250, 2)
+    
+    new_image = np.copy(test_image)
+    v1 = test_image[coord1]
+    v2 = test_image[coord2]
+    new_image[coord1] = v2
+    new_image[coord2] = v1
+    hsg, _, _ = get_glcm(new_image[np.newaxis, ...], normed=True, cut='start')
+    abs_diff_hs = np.absolute(hs-hsg)
+    new_err = np.sqrt(np.sum(abs_diff_hs ** 2))
+    
+    if new_err >= err:
+        unsuccess_count += 1
+        if unsuccess_count % 100 == 0:
+            print(f'unsuccess_count {unsuccess_count}')
+        continue
+    
+    success_count += 1
+    if success_count % 100 == 0:
+        print(f'success_count {success_count}')
+    test_image = new_image
+    err = new_err
+    
+    if i % 100 == 0:
+        print(f'current error: {err}')
+        plot_glcms(hs, hsg, abs_diff_hs, test_image)
+
+print(f'success_count: {success_count}')
+print(f'unsuccess_count: {unsuccess_count}')
+plot_glcms(hs, hsg, abs_diff_hs, test_image)
+
 # %%
