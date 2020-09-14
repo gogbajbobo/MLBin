@@ -23,6 +23,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # %%
+import time
+
+# %%
 x = np.arange(100)
 y = np.power(x, 2)
 
