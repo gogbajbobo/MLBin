@@ -31,8 +31,8 @@ with h5py.File(f'{file_dir}sample.h5', mode='r') as file:
     data = file['Reconstruction'][()]
 
 # %% id="5PiB93tFxl3k" colab_type="code" colab={}
-bits = 5
-max_v = 2**5
+bits = 3
+max_v = 2**bits
 data_int = helper.image_digitize(data, bits)
 
 # %% id="Ij2yrjqCyJZ1" colab_type="code" colab={"base_uri": "https://localhost:8080/", "height": 34} outputId="10c0e1d6-e287-4e19-b6c5-db169460dbcf"
@@ -163,6 +163,16 @@ def get_glcm(arr, levels=256, symmetric=True, normed=True, cut=None):
 
 
 # %%
+def switch_pixels(img, p1, p2):
+    _img = np.copy(img)
+    v1 = img[p1]
+    v2 = img[p2]
+    _img[p1] = v2
+    _img[p2] = v1
+    return _img
+
+
+# %%
 a = np.array(
     [[[0, 0],
       [0, 0]],
@@ -175,8 +185,14 @@ print(f'x0\n{a[:, :, 0]}')
 
 h, v, d = get_glcm(a, levels=3, normed=False, symmetric=False)
 print(f'h\n{h}')
-print(f'v\n{v}')
-print(f'd\n{d}')
+# print(f'v\n{v}')
+# print(f'd\n{d}')
+
+# %%
+b = switch_pixels(a, (1, 0, 1), (0, 0, 0))
+print(b)
+h, _, _ = get_glcm(b, levels=3, normed=False, symmetric=False)
+print(f'h\n{h}')
 
 # %%
 hcm, vcm, dcm = get_glcm(data_stones, levels=max_v, normed=True, cut='start')
@@ -387,9 +403,54 @@ def plot_glcms(glcm, glcmg, diff, generated_image):
 plot_glcms(hs, hsg, abs_diff_hs, stones_pdf_image)
 
 # %%
+image_to_test = np.copy(pores_pdf_image)
+
+
+hsg, _, _ = get_glcm(image_to_test[np.newaxis, ...], levels=max_v, normed=False, symmetric=False, cut='end')
+
 rx1, rx2, ry1, ry2 = np.random.randint(0, 250, 4)
-stones_pdf_image[rx1, ry1]
-stones_pdf_image[rx2, ry2]
+new_image = switch_pixels(image_to_test, (ry1, rx1), (ry2, rx2))
+new_h_glcm, _, _ = get_glcm(new_image[np.newaxis, ...], levels=max_v, normed=False, symmetric=False, cut='end')
+
+test_hsg = np.copy(hsg)
+
+print((rx1, ry1), (rx2, ry2))
+
+v1 = image_to_test[ry1, rx1]
+v1_left = image_to_test[ry1, rx1 - 1]
+v1_right = image_to_test[ry1, rx1 + 1]
+v2 = image_to_test[ry2, rx2]
+v2_left = image_to_test[ry2, rx2 - 1]
+v2_right = image_to_test[ry2, rx2 + 1]
+
+print(v1_left, v1, v1_right)
+print(v2_left, v2, v2_right)
+
+v1 = new_image[ry1, rx1]
+v1_left = new_image[ry1, rx1 - 1]
+v1_right = new_image[ry1, rx1 + 1]
+v2 = new_image[ry2, rx2]
+v2_left = new_image[ry2, rx2 - 1]
+v2_right = new_image[ry2, rx2 + 1]
+
+print(v1_left, v1, v1_right)
+print(v2_left, v2, v2_right)
+
+print(f'hsg: \n{hsg.astype(np.int)}')
+print(f'new_h_glcm: \n{new_h_glcm.astype(np.int)}')
+
+# test_hsg[v1, v1_left] = test_hsg[v1, v1_left] - 1
+# test_hsg[v1, v1_right] = test_hsg[v1, v1_right] - 1
+# test_hsg[v2, v2_left] = test_hsg[v2, v2_left] - 1
+# test_hsg[v2, v2_right] = test_hsg[v2, v2_right] - 1
+
+# test_hsg[v2, v1_left] = test_hsg[v2, v1_left] + 1
+# test_hsg[v2, v1_right] = test_hsg[v2, v1_right] + 1
+# test_hsg[v1, v2_left] = test_hsg[v1, v2_left] + 1
+# test_hsg[v1, v2_right] = test_hsg[v1, v2_right] + 1
+
+# print((new_h_glcm - hsg).astype(np.int))
+# print((new_h_glcm - test_hsg).astype(np.int))
 
 # %%
 test_image = np.copy(stones_pdf_image)
