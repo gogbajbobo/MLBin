@@ -309,3 +309,8 @@ def crop(img, shape, center=None):
     )
 
     return img[tuple(ranges)]
+
+
+def image_digitize(img, bits=8):
+    bins = np.linspace(np.min(img), np.max(img), 2 ** bits)
+    return np.digitize(img, bins, True).astype(np.uint8)
