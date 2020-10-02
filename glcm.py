@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.6.0
+#       jupytext_version: 1.5.2
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -27,19 +27,17 @@ import helper
 
 # %% id="OBfxNFzutGvq" colab_type="code" colab={}
 file_dir = '/Users/grimax/Desktop/tmp/porous sample 2/'
-file = h5py.File(f'{file_dir}sample.h5', mode='r')
-
-# %% id="aq9V9ivMuDa7" colab_type="code" colab={}
-data = file['Reconstruction'][()]
+with h5py.File(f'{file_dir}sample.h5', mode='r') as file:
+    data = file['Reconstruction'][()]
 
 # %% id="5PiB93tFxl3k" colab_type="code" colab={}
-data_int = data - np.min(data)
-data_int = 255 * data_int / np.max(data_int)
-data_int = data_int.astype(np.uint8)
+bits = 5
+max_v = 2**5
+data_int = helper.image_digitize(data, bits)
 
 # %% id="Ij2yrjqCyJZ1" colab_type="code" colab={"base_uri": "https://localhost:8080/", "height": 34} outputId="10c0e1d6-e287-4e19-b6c5-db169460dbcf"
-file_to_save = h5py.File(f'{file_dir}sample_int.h5', mode='w')
-file_to_save.create_dataset('Reconstruction', data=data_int, compression='lzf')
+with h5py.File(f'{file_dir}sample_int.h5', mode='w') as file_to_save:
+    file_to_save.create_dataset('Reconstruction', data=data_int, compression='lzf')
 
 # %% id="Tlan_ddGy4JE" colab_type="code" colab={"base_uri": "https://localhost:8080/", "height": 611} outputId="0b4c5713-3ff9-4a19-8bef-fafe347e9325"
 plt.figure(figsize=(5, 5))
@@ -53,72 +51,73 @@ plt.imshow(data_bin[:, :, 0])
 # %%
 data_bin_erosion = helper.erosion(data_bin)
 data_bin_dilation = helper.dilation(data_bin)
+data_bin_edges = np.ones(data_bin.shape) - data_bin_erosion - ~data_bin_dilation
 
-fig, axes = plt.subplots(1, 2, figsize=(10, 5))
+fig, axes = plt.subplots(1, 3, figsize=(15, 5))
 axes[0].imshow(data_bin_erosion[:, :, 0])
 axes[1].imshow(data_bin_dilation[:, :, 0])
+axes[2].imshow(data_bin_edges[:, :, 0])
 
 # %%
 data_stones = np.copy(data_int)
-data_stones[data_bin_erosion == False] = 0
-plt.figure(figsize=(5, 5))
-plt.imshow(data_stones[:, :, 0])
-
-# %%
 data_pores = np.copy(data_int)
-data_pores[data_bin_dilation == True] = 255
-plt.figure(figsize=(5, 5))
-plt.imshow(data_pores[:, :, 0])
+data_edges = np.copy(data_int)
+
+data_stones[data_bin_erosion == False] = 0
+data_pores[data_bin_dilation == True] = max_v - 1
+data_edges[data_bin_edges == False] = 0
+
+fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+axes[0].imshow(data_stones[:, :, 0])
+axes[1].imshow(data_pores[:, :, 0])
+axes[2].imshow(data_edges[:, :, 0])
 
 # %% id="_9w49PKE0DmQ" colab_type="code" colab={}
-result = np.zeros((256, 256))
+result = np.zeros((max_v, max_v))
 
 for i in np.arange(250):
-  result += skimf.greycomatrix(data_int[:, :, i], [1], [0], symmetric=True)[:, :, 0, 0]
+  result += skimf.greycomatrix(data_int[:, :, i], [1], [0], levels=max_v, symmetric=True)[:, :, 0, 0]
 
 # %% id="0Yw8aEgK2OrU" colab_type="code" colab={"base_uri": "https://localhost:8080/", "height": 611} outputId="c23599f2-9c4d-4dcc-d38d-d9f9aa10f43f"
 plt.figure(figsize=(5, 5))
 plt.imshow(result)
 
-# %% id="wgheTDjO37Yf" colab_type="code" colab={"base_uri": "https://localhost:8080/", "height": 1000} outputId="e7fc9fb6-f714-4112-f8a2-98a7dedc5692"
-# for i in np.arange(256):
-#   print(i, np.sum(result[i, :]), np.sum(result[:, i]))
-
-# %% id="nuUhzQ-J64Ms" colab_type="code" colab={"base_uri": "https://localhost:8080/", "height": 609} outputId="d096b4c3-138f-4aab-e22f-78f9667597fa"
-plt.figure(figsize=(10, 5))
-plt.yscale('log')
-plt.plot(result[114, :])
-
-# %% id="fShgZQwO76Qi" colab_type="code" colab={"base_uri": "https://localhost:8080/", "height": 1000} outputId="bfbabdc6-aef4-4112-9710-8216a936c6d7"
-stds = []
-
-for i in np.arange(256):
-  res = result[i, :]
-  hist_dist = scipy.stats.rv_histogram((res, np.arange(257)))
-  stds.append(hist_dist.std())
-#   print(i, hist_dist.mean(), hist_dist.std())
-
-# %% id="oHA7VhLkAUAN" colab_type="code" colab={"base_uri": "https://localhost:8080/", "height": 609} outputId="fc654f3f-90a7-46d3-d941-9fbbad3ebf88"
-plt.figure(figsize=(10, 5))
-plt.plot(stds)
-
 # %%
-result_stones = np.zeros((255, 255))
+result_stones = np.zeros((max_v - 1, max_v - 1))
+result_pores = np.zeros((max_v - 1, max_v - 1))
+result_edges = np.zeros((max_v - 1, max_v - 1))
 
 for i in np.arange(250):
-  result_stones += skimf.greycomatrix(data_stones[:, :, i], [1], [0], symmetric=True)[1:, 1:, 0, 0]
 
-plt.figure(figsize=(5, 5))
-plt.imshow(result_stones)
+    result_stones += skimf.greycomatrix(
+        data_stones[:, :, i], 
+        [1], 
+        [0], 
+        levels=max_v, 
+        symmetric=True
+    )[1:, 1:, 0, 0]
 
-# %%
-result_pores = np.zeros((255, 255))
+    result_pores += skimf.greycomatrix(
+        data_pores[:, :, i], 
+        [1], 
+        [0], 
+        levels=max_v, 
+        symmetric=True
+    )[:max_v - 1, :max_v - 1, 0, 0]
 
-for i in np.arange(250):
-  result_pores += skimf.greycomatrix(data_pores[:, :, i], [1], [0], symmetric=True)[:255, :255, 0, 0]
+    result_edges += skimf.greycomatrix(
+        data_edges[:, :, i], 
+        [1], 
+        [0], 
+        levels=max_v, 
+        symmetric=True
+    )[1:, 1:, 0, 0]
 
-plt.figure(figsize=(5, 5))
-plt.imshow(result_pores)
+
+fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+axes[0].imshow(result_stones)
+axes[1].imshow(result_pores)
+axes[2].imshow(result_edges)
 
 
 # %%
@@ -180,7 +179,7 @@ print(f'v\n{v}')
 print(f'd\n{d}')
 
 # %%
-hcm, vcm, dcm = get_glcm(data_stones, normed=True, cut='start')
+hcm, vcm, dcm = get_glcm(data_stones, levels=max_v, normed=True, cut='start')
 fig, axes = plt.subplots(1, 3, figsize=(15, 5))
 axes[0].imshow(hcm)
 axes[1].imshow(vcm)
@@ -197,7 +196,7 @@ vd_diff = calc_euclidian_distance(vcm, dcm)
 print(hv_diff, hd_diff, vd_diff)
 
 # %%
-stones_hist, bins = np.histogram(data_stones, bins=255)
+stones_hist, bins = np.histogram(data_stones, bins=max_v - 1)
 stones_hist[0] = 0
 
 # %%
@@ -209,17 +208,17 @@ helper.plot_bars(stones_pdf, bins, log=True)
 
 # %%
 # %%time
-stones_pdf_test = np.random.choice(255, size=250*250*2, p=stones_pdf)
-plt.hist(stones_pdf_test, bins=256, log=True)
-plt.xlim(0, 255)
+stones_pdf_test = np.random.choice(max_v - 1, size=250*250*2, p=stones_pdf)
+plt.hist(stones_pdf_test, bins=max_v, log=True)
+plt.xlim(0, max_v - 1)
 
 # %%
 stones_pdf_image = stones_pdf_test.reshape((250, 250, 2))
 plt.figure(figsize=(5, 5))
-plt.imshow(stones_pdf_image[:, :, 0], vmin=0, vmax=255)
+plt.imshow(stones_pdf_image[:, :, 0], vmin=0, vmax=max_v - 1)
 
 # %%
-hcm_g, vcm_g, dcm_g = get_glcm(stones_pdf_image, normed=True, cut='start')
+hcm_g, vcm_g, dcm_g = get_glcm(stones_pdf_image, levels=max_v, normed=True, cut='start')
 fig, axes = plt.subplots(1, 3, figsize=(15, 5))
 axes[0].imshow(hcm_g)
 axes[1].imshow(vcm_g)
@@ -268,35 +267,45 @@ origin_glcm_props - generated_glcm_props
 object_image = data_int[:, :, 0]
 stones_image = data_stones[:, :, 0]
 pores_image = data_pores[:, :, 0]
+edges_image = data_edges[:, :, 0]
 
-fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+fig, axes = plt.subplots(1, 4, figsize=(20, 5))
 axes[0].imshow(object_image)
 axes[1].imshow(stones_image)
 axes[2].imshow(pores_image)
+axes[3].imshow(edges_image)
 
 # %%
-h, _, _ = get_glcm(object_image[np.newaxis, ...], normed=True)
-hs, _, _ = get_glcm(stones_image[np.newaxis, ...], normed=True, cut='start')
-hp, _, _ = get_glcm(pores_image[np.newaxis, ...], normed=True, cut='end')
+h, _, _ = get_glcm(object_image[np.newaxis, ...], levels=max_v, normed=True)
+hs, _, _ = get_glcm(stones_image[np.newaxis, ...], levels=max_v, normed=True, cut='start')
+hp, _, _ = get_glcm(pores_image[np.newaxis, ...], levels=max_v, normed=True, cut='end')
+he, _, _ = get_glcm(edges_image[np.newaxis, ...], levels=max_v, normed=True, cut='start')
 
-fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+fig, axes = plt.subplots(1, 4, figsize=(20, 5))
 axes[0].imshow(h)
 axes[1].imshow(hs)
 axes[2].imshow(hp)
+axes[3].imshow(he)
 
 # %%
-object_hist, bins = np.histogram(object_image, bins=255, range=(0, 255))
+bins = max_v - 1
+
+object_hist, bins = np.histogram(object_image, bins=bins, range=(0, bins))
 helper.plot_bars(object_hist, bins, log=True)
 
-stones_hist, bins = np.histogram(stones_image, bins=255, range=(0, 255))
+stones_hist, bins = np.histogram(stones_image, bins=bins, range=(0, bins))
 stones_hist[0] = 0
 helper.plot_bars(stones_hist, bins, log=True)
 
-pores_hist, bins = np.histogram(pores_image, bins=255, range=(0, 255))
+pores_hist, bins = np.histogram(pores_image, bins=bins, range=(0, bins))
 pores_hist[-1] = 0
 helper.plot_bars(pores_hist, bins, log=True)
 
-sum_hist = stones_hist + pores_hist
+edges_hist, bins = np.histogram(edges_image, bins=bins, range=(0, bins))
+edges_hist[0] = 0
+helper.plot_bars(edges_hist, bins, log=True)
+
+sum_hist = stones_hist + pores_hist + edges_hist
 helper.plot_bars(sum_hist, bins, log=True)
 
 diff_hist = object_hist - sum_hist
@@ -305,50 +314,65 @@ helper.plot_bars(diff_hist, bins, log=True)
 # %%
 stones_pdf = stones_hist / np.sum(stones_hist)
 pores_pdf = pores_hist / np.sum(pores_hist)
+edges_pdf = edges_hist / np.sum(edges_hist)
 
 # %%
 # %%time
-stones_pdf_data = np.random.choice(255, size=250*250, p=stones_pdf)
-plt.hist(stones_pdf_data, bins=256, log=True)
-plt.xlim(0, 255)
+stones_pdf_data = np.random.choice(max_v - 1, size=250*250, p=stones_pdf)
+plt.hist(stones_pdf_data, bins=max_v, log=True)
+plt.xlim(0, max_v - 1)
 
-pores_pdf_data = np.random.choice(255, size=250*250, p=pores_pdf)
-plt.hist(pores_pdf_data, bins=256, log=True)
-plt.xlim(0, 255)
+pores_pdf_data = np.random.choice(max_v - 1, size=250*250, p=pores_pdf)
+plt.hist(pores_pdf_data, bins=max_v, log=True)
+plt.xlim(0, max_v - 1)
+
+edges_pdf_data = np.random.choice(max_v - 1, size=250*250, p=edges_pdf)
+plt.hist(edges_pdf_data, bins=max_v, log=True)
+plt.xlim(0, max_v - 1)
 
 # %%
 stones_pdf_image = stones_pdf_data.reshape((250, 250))
 pores_pdf_image = pores_pdf_data.reshape((250, 250))
+edges_pdf_image = edges_pdf_data.reshape((250, 250))
 
-fig, axes = plt.subplots(1, 2, figsize=(10, 5))
-axes[0].imshow(stones_pdf_image, vmin=0, vmax=255)
-axes[1].imshow(pores_pdf_image, vmin=0, vmax=255)
+fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+axes[0].imshow(stones_pdf_image, vmin=0, vmax=max_v - 1)
+axes[1].imshow(pores_pdf_image, vmin=0, vmax=max_v - 1)
+axes[2].imshow(edges_pdf_image, vmin=0, vmax=max_v - 1)
 
 # %%
-hsg, _, _ = get_glcm(stones_pdf_image[np.newaxis, ...], normed=True, cut='start')
-hpg, _, _ = get_glcm(pores_pdf_image[np.newaxis, ...], normed=True, cut='end')
+hsg, _, _ = get_glcm(stones_pdf_image[np.newaxis, ...], levels=max_v, normed=True, cut='start')
+hpg, _, _ = get_glcm(pores_pdf_image[np.newaxis, ...], levels=max_v, normed=True, cut='end')
+heg, _, _ = get_glcm(edges_pdf_image[np.newaxis, ...], levels=max_v, normed=True, cut='start')
 
-fig, axes = plt.subplots(1, 2, figsize=(10, 5))
+fig, axes = plt.subplots(1, 3, figsize=(15, 5))
 axes[0].imshow(hs)
 axes[1].imshow(hp)
+axes[2].imshow(he)
 
-fig, axes = plt.subplots(1, 2, figsize=(10, 5))
+fig, axes = plt.subplots(1, 3, figsize=(15, 5))
 axes[0].imshow(hsg)
 axes[1].imshow(hpg)
+axes[2].imshow(heg)
 
-fig, axes = plt.subplots(1, 2, figsize=(10, 5))
+fig, axes = plt.subplots(1, 3, figsize=(15, 5))
 axes[0].imshow(hs-hsg)
 axes[1].imshow(hp-hpg)
+axes[2].imshow(he-heg)
 
 abs_diff_hs = np.absolute(hs-hsg)
 abs_diff_hp = np.absolute(hp-hpg)
-fig, axes = plt.subplots(1, 2, figsize=(10, 5))
+abs_diff_he = np.absolute(he-heg)
+
+fig, axes = plt.subplots(1, 3, figsize=(15, 5))
 axes[0].imshow(abs_diff_hs)
 axes[1].imshow(abs_diff_hp)
+axes[2].imshow(abs_diff_he)
 
 # %%
 print(np.unravel_index(np.argmax(abs_diff_hs), abs_diff_hs.shape))
 print(np.unravel_index(np.argmax(abs_diff_hp), abs_diff_hp.shape))
+print(np.unravel_index(np.argmax(abs_diff_he), abs_diff_he.shape))
 
 
 # %%
@@ -357,7 +381,7 @@ def plot_glcms(glcm, glcmg, diff, generated_image):
     axes[0].imshow(glcm)
     axes[1].imshow(glcmg)
     axes[2].imshow(diff)
-    axes[3].imshow(generated_image, vmin=0, vmax=255)
+    axes[3].imshow(generated_image, vmin=0, vmax=max_v - 1)
     print(np.unravel_index(np.argmax(diff), diff.shape))
     
 plot_glcms(hs, hsg, abs_diff_hs, stones_pdf_image)
