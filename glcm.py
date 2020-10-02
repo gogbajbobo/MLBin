@@ -31,7 +31,7 @@ with h5py.File(f'{file_dir}sample.h5', mode='r') as file:
     data = file['Reconstruction'][()]
 
 # %% id="5PiB93tFxl3k" colab_type="code" colab={}
-bits = 3
+bits = 8
 max_v = 2**bits
 data_int = helper.image_digitize(data, bits)
 
@@ -410,6 +410,7 @@ hsg, _, _ = get_glcm(image_to_test[np.newaxis, ...], levels=max_v, normed=False,
 
 rx1, rx2, ry1, ry2 = np.random.randint(0, 250, 4)
 new_image = switch_pixels(image_to_test, (ry1, rx1), (ry2, rx2))
+# %time
 new_h_glcm, _, _ = get_glcm(new_image[np.newaxis, ...], levels=max_v, normed=False, symmetric=False, cut='end')
 
 test_hsg = np.copy(hsg)
@@ -426,31 +427,36 @@ v2_right = image_to_test[ry2, rx2 + 1]
 print(v1_left, v1, v1_right)
 print(v2_left, v2, v2_right)
 
-v1 = new_image[ry1, rx1]
-v1_left = new_image[ry1, rx1 - 1]
-v1_right = new_image[ry1, rx1 + 1]
-v2 = new_image[ry2, rx2]
-v2_left = new_image[ry2, rx2 - 1]
-v2_right = new_image[ry2, rx2 + 1]
+# v1 = new_image[ry1, rx1]
+# v1_left = new_image[ry1, rx1 - 1]
+# v1_right = new_image[ry1, rx1 + 1]
+# v2 = new_image[ry2, rx2]
+# v2_left = new_image[ry2, rx2 - 1]
+# v2_right = new_image[ry2, rx2 + 1]
 
-print(v1_left, v1, v1_right)
-print(v2_left, v2, v2_right)
+# print(v1_left, v1, v1_right)
+# print(v2_left, v2, v2_right)
 
-print(f'hsg: \n{hsg.astype(np.int)}')
-print(f'new_h_glcm: \n{new_h_glcm.astype(np.int)}')
+# print(f'hsg: \n{hsg.astype(np.int)}')
+# print(f'new_h_glcm: \n{new_h_glcm.astype(np.int)}')
 
-# test_hsg[v1, v1_left] = test_hsg[v1, v1_left] - 1
-# test_hsg[v1, v1_right] = test_hsg[v1, v1_right] - 1
-# test_hsg[v2, v2_left] = test_hsg[v2, v2_left] - 1
-# test_hsg[v2, v2_right] = test_hsg[v2, v2_right] - 1
+def test_speed():
+    test_hsg[v1_left, v1] -= 1
+    test_hsg[v1, v1_right] -= 1
+    test_hsg[v2_left, v2] -= 1
+    test_hsg[v2, v2_right] -= 1
 
-# test_hsg[v2, v1_left] = test_hsg[v2, v1_left] + 1
-# test_hsg[v2, v1_right] = test_hsg[v2, v1_right] + 1
-# test_hsg[v1, v2_left] = test_hsg[v1, v2_left] + 1
-# test_hsg[v1, v2_right] = test_hsg[v1, v2_right] + 1
+    test_hsg[v1_left, v2] += 1
+    test_hsg[v2, v1_right] += 1
+    test_hsg[v2_left, v1] += 1
+    test_hsg[v1, v2_right] += 1
 
+# %time
+test_speed()
+    
 # print((new_h_glcm - hsg).astype(np.int))
-# print((new_h_glcm - test_hsg).astype(np.int))
+# print((test_hsg - hsg).astype(np.int))
+print(np.sum((test_hsg - new_h_glcm).astype(np.int)))
 
 # %%
 test_image = np.copy(stones_pdf_image)
