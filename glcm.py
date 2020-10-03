@@ -31,7 +31,7 @@ with h5py.File(f'{file_dir}sample.h5', mode='r') as file:
     data = file['Reconstruction'][()]
 
 # %% id="5PiB93tFxl3k" colab_type="code" colab={}
-bits = 8
+bits = 5
 max_v = 2**bits
 data_int = helper.image_digitize(data, bits)
 
@@ -403,15 +403,15 @@ def plot_glcms(glcm, glcmg, diff, generated_image):
 plot_glcms(hs, hsg, abs_diff_hs, stones_pdf_image)
 
 # %%
-image_to_test = np.copy(pores_pdf_image)
+image_to_test = np.copy(stones_pdf_image)
 
 
-hsg, _, _ = get_glcm(image_to_test[np.newaxis, ...], levels=max_v, normed=False, symmetric=False, cut='end')
+hsg, _, _ = get_glcm(image_to_test[np.newaxis, ...], levels=max_v, normed=False, symmetric=False, cut='start')
 
 rx1, rx2, ry1, ry2 = np.random.randint(0, 250, 4)
 new_image = switch_pixels(image_to_test, (ry1, rx1), (ry2, rx2))
 # %time
-new_h_glcm, _, _ = get_glcm(new_image[np.newaxis, ...], levels=max_v, normed=False, symmetric=False, cut='end')
+new_h_glcm, _, _ = get_glcm(new_image[np.newaxis, ...], levels=max_v, normed=False, symmetric=False, cut='start')
 
 test_hsg = np.copy(hsg)
 
@@ -459,52 +459,91 @@ test_speed()
 print(np.sum((test_hsg - new_h_glcm).astype(np.int)))
 
 # %%
+# %%time
 test_image = np.copy(stones_pdf_image)
-hs, _, _ = get_glcm(stones_image[np.newaxis, ...], normed=True, cut='start')
-hsg, _, _ = get_glcm(test_image[np.newaxis, ...], normed=True, cut='start')
+hs, _, _ = get_glcm(stones_image[np.newaxis, ...], levels=max_v, normed=False, cut='start')
+hsg, _, _ = get_glcm(test_image[np.newaxis, ...], levels=max_v, normed=False, cut='start')
 abs_diff_hs = np.absolute(hs-hsg)
 err = np.sqrt(np.sum(abs_diff_hs ** 2))
 success_count = 0
 unsuccess_count = 0
+trans_count = 0
 print(f'initial error: {err}')
+plot_glcms(hs, hsg, abs_diff_hs, test_image)
 
-for i in range(1000):
+num_of_iters = 10_000_000
+
+for i in range(num_of_iters):
     
+    if i % (num_of_iters//10) == 0:
+        print(f'current error: {err}')
+        plot_glcms(hs, hsg, abs_diff_hs, test_image)
+
 #     max_diff_value, _ = np.unravel_index(np.argmax(abs_diff_hs), abs_diff_hs.shape)
 #     result = np.where(stones_pdf_image == max_diff_value)
 #     listOfCoordinates = list(zip(result[0], result[1]))
 #     max_value_coord = listOfCoordinates[0]
 
-    coord1 = np.random.randint(0, 250, 2)
-    coord2 = np.random.randint(0, 250, 2)
+    coord1 = np.random.randint(1, 249, 2)
+    coord2 = np.random.randint(1, 249, 2)
     
-    new_image = np.copy(test_image)
-    v1 = test_image[coord1]
-    v2 = test_image[coord2]
-    new_image[coord1] = v2
-    new_image[coord2] = v1
-    hsg, _, _ = get_glcm(new_image[np.newaxis, ...], normed=True, cut='start')
-    abs_diff_hs = np.absolute(hs-hsg)
+    ry1, rx1 = coord1
+    ry2, rx2 = coord2
+    
+    v1 = test_image[ry1, rx1]
+    v1_left = test_image[ry1, rx1 - 1]
+    v1_right = test_image[ry1, rx1 + 1]
+    v2 = test_image[ry2, rx2]
+    v2_left = test_image[ry2, rx2 - 1]
+    v2_right = test_image[ry2, rx2 + 1]
+
+    test_hsg = np.copy(hsg)
+    
+    test_hsg[v1_left, v1] -= 1
+    test_hsg[v1, v1_right] -= 1
+    test_hsg[v2_left, v2] -= 1
+    test_hsg[v2, v2_right] -= 1
+
+    test_hsg[v1_left, v2] += 1
+    test_hsg[v2, v1_right] += 1
+    test_hsg[v2_left, v1] += 1
+    test_hsg[v1, v2_right] += 1
+
+    abs_diff_hs = np.absolute(hs - test_hsg)
     new_err = np.sqrt(np.sum(abs_diff_hs ** 2))
     
     if new_err >= err:
+        p = 1 / (1 + np.exp(new_err/(num_of_iters - i + 100)))
+        if p > np.random.uniform(0, 1):
+            test_image = switch_pixels(test_image, coord1, coord2)
+            hsg = test_hsg
+            err = new_err
+            trans_count += 1
+            if trans_count % (num_of_iters//10) == 0:
+                print(f'trans_count {trans_count}')
+            continue
+
         unsuccess_count += 1
-        if unsuccess_count % 100 == 0:
+        if unsuccess_count % (num_of_iters//10) == 0:
             print(f'unsuccess_count {unsuccess_count}')
         continue
     
     success_count += 1
-    if success_count % 100 == 0:
+    if success_count % (num_of_iters//10) == 0:
         print(f'success_count {success_count}')
-    test_image = new_image
+
+    test_image = switch_pixels(test_image, coord1, coord2)
+    hsg = test_hsg
     err = new_err
     
-    if i % 100 == 0:
-        print(f'current error: {err}')
-        plot_glcms(hs, hsg, abs_diff_hs, test_image)
-
 print(f'success_count: {success_count}')
 print(f'unsuccess_count: {unsuccess_count}')
+print(f'trans_count: {trans_count}')
+print(f'final_err: {err}')
 plot_glcms(hs, hsg, abs_diff_hs, test_image)
+
+fig, axes = plt.subplots(1, 2, figsize=(20, 10))
+axes[0].imshow(stones_pdf_image)
+axes[1].imshow(test_image)
 
 # %%
