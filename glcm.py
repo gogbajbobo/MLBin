@@ -618,3 +618,25 @@ axes[0].imshow(stones_pdf_image)
 axes[1].imshow(test_image)
 
 # %%
+plt.imshow(object_image, cmap='gray')
+plt.axis('off')
+plt.savefig('test.png')
+
+# %%
+histogram, _ = np.histogram(object_image.ravel(), bins=32)
+otsu_level, otsu_criteria = helper.mod_otsu(histogram)
+print(otsu_level, otsu_criteria)
+
+# %%
+histogram
+
+# %%
+np.arange(n_bins) * histogram
+
+# %%
+total_mean
+
+# %%
+total_variance
+
+# %%
