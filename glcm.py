@@ -446,12 +446,25 @@ plot_glcms(hs, hsg, abs_diff_hs, stones_pdf_image)
 image_to_test = np.copy(stones_pdf_image)
 
 
-hsg, _, _ = get_glcm(image_to_test[np.newaxis, ...], levels=max_v, normed=False, symmetric=False, cut='start')
+hsg, _, _ = get_glcm(
+    image_to_test[np.newaxis, ...], 
+    levels=max_v, 
+    normed=False, 
+    symmetric=False, 
+#     cut='start'
+)
 
 rx1, rx2, ry1, ry2 = np.random.randint(0, 250, 4)
 new_image = switch_pixels(image_to_test, (ry1, rx1), (ry2, rx2))
+
 # %time
-new_h_glcm, _, _ = get_glcm(new_image[np.newaxis, ...], levels=max_v, normed=False, symmetric=False, cut='start')
+new_h_glcm, _, _ = get_glcm(
+    new_image[np.newaxis, ...], 
+    levels=max_v, 
+    normed=False, 
+    symmetric=False, 
+#     cut='start'
+)
 
 test_hsg = np.copy(hsg)
 
@@ -460,6 +473,7 @@ print((rx1, ry1), (rx2, ry2))
 v1 = image_to_test[ry1, rx1]
 v1_left = image_to_test[ry1, rx1 - 1]
 v1_right = image_to_test[ry1, rx1 + 1]
+
 v2 = image_to_test[ry2, rx2]
 v2_left = image_to_test[ry2, rx2 - 1]
 v2_right = image_to_test[ry2, rx2 + 1]
