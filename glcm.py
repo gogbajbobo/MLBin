@@ -543,42 +543,45 @@ for i in range(num_of_iters):
         print(f'current error: {err}')
         plot_glcms(hs, hsg, abs_diff_hs, test_image)
 
-#     max_diff_value, _ = np.unravel_index(np.argmax(abs_diff_hs), abs_diff_hs.shape)
-#     result = np.where(stones_pdf_image == max_diff_value)
-#     listOfCoordinates = list(zip(result[0], result[1]))
-#     max_value_coord = listOfCoordinates[0]
+        tmp_hsg, _, _ = get_glcm(test_image[np.newaxis, ...], levels=max_v, normed=False)
+        print(f'glcm diff: {np.sqrt(np.sum((hsg - tmp_hsg)**2))}')
+        print(f'tmp_hsg min max {np.min(tmp_hsg)}, {np.max(tmp_hsg)}')
+        print(f'test_hsg min max {np.min(hsg)}, {np.max(hsg)}')
 
-    coord1 = np.random.randint(1, 249, 2)
-    coord2 = np.random.randint(1, 249, 2)
+
+    coord1 = np.random.randint(1, test_image_size-1, 2)
+    coord2 = np.random.randint(1, test_image_size-1, 2)
     
     ry1, rx1 = coord1
     ry2, rx2 = coord2
-    
-    v1 = test_image[ry1, rx1]
-    v1_left = test_image[ry1, rx1 - 1]
-    v1_right = test_image[ry1, rx1 + 1]
-    v2 = test_image[ry2, rx2]
-    v2_left = test_image[ry2, rx2 - 1]
-    v2_right = test_image[ry2, rx2 + 1]
 
-    test_hsg = np.copy(hsg)
-    
-    test_hsg[v1_left, v1] -= 1
-    test_hsg[v1, v1_right] -= 1
-    test_hsg[v2_left, v2] -= 1
-    test_hsg[v2, v2_right] -= 1
+#     v1 = test_image[ry1, rx1]
+#     v1_left = test_image[ry1, rx1 - 1]
+#     v1_right = test_image[ry1, rx1 + 1]
+#     v2 = test_image[ry2, rx2]
+#     v2_left = test_image[ry2, rx2 - 1]
+#     v2_right = test_image[ry2, rx2 + 1]
 
-    test_hsg[v1_left, v2] += 1
-    test_hsg[v2, v1_right] += 1
-    test_hsg[v2_left, v1] += 1
-    test_hsg[v1, v2_right] += 1
+#     test_hsg = np.copy(hsg)
+        
+#     test_hsg[v1_left, v1] -= 1
+#     test_hsg[v1, v1_right] -= 1
+#     test_hsg[v2_left, v2] -= 1
+#     test_hsg[v2, v2_right] -= 1
+
+#     test_hsg[v1_left, v2] += 1
+#     test_hsg[v2, v1_right] += 1
+#     test_hsg[v2_left, v1] += 1
+#     test_hsg[v1, v2_right] += 1
+
+    tmp_image = switch_pixels(test_image, coord1, coord2)
+    test_hsg, _, _ = get_glcm(tmp_image[np.newaxis, ...], levels=max_v, normed=False)
 
     abs_diff_hs = np.absolute(hs - test_hsg)
     new_err = np.sqrt(np.sum(abs_diff_hs ** 2))
     
     if new_err >= err:
-#         p = 1 / (1 + np.exp(new_err/(num_of_iters - i + 100)))
-        k = new_err / (new_err * (num_of_iters - i) / num_of_iters)
+        k = 2 * new_err / (new_err * (num_of_iters - i + 1) / num_of_iters)
         p = 1 / (1 + np.exp(k))
 
         if p > np.random.uniform(0, 1):
@@ -596,13 +599,13 @@ for i in range(num_of_iters):
             print(f'p {p}')
         continue
     
+    test_image = switch_pixels(test_image, coord1, coord2)
+    hsg = test_hsg
+    err = new_err
     success_count += 1
     if success_count % (num_of_iters//10) == 0:
         print(f'success_count {success_count}')
 
-    test_image = switch_pixels(test_image, coord1, coord2)
-    hsg = test_hsg
-    err = new_err
     
 print(f'success_count: {success_count}')
 print(f'unsuccess_count: {unsuccess_count}')
