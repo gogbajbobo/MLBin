@@ -535,7 +535,7 @@ trans_count = 0
 print(f'initial error: {err}')
 plot_glcms(hs, hsg, abs_diff_hs, test_image)
 
-num_of_iters = 10_000_000
+num_of_iters = 1_000_000
 
 for i in range(num_of_iters):
     
