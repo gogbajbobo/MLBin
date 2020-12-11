@@ -42,6 +42,7 @@ with h5py.File(f'{file_dir}sample_int.h5', mode='w') as file_to_save:
 # %% id="Tlan_ddGy4JE" colab_type="code" colab={"base_uri": "https://localhost:8080/", "height": 611} outputId="0b4c5713-3ff9-4a19-8bef-fafe347e9325"
 plt.figure(figsize=(5, 5))
 plt.imshow(data_int[:, :, 0])
+plt.colorbar()
 
 # %%
 data_bin, _ = helper.binarize_image(data_int)
@@ -81,6 +82,7 @@ for i in np.arange(250):
 # %% id="0Yw8aEgK2OrU" colab_type="code" colab={"base_uri": "https://localhost:8080/", "height": 611} outputId="c23599f2-9c4d-4dcc-d38d-d9f9aa10f43f"
 plt.figure(figsize=(5, 5))
 plt.imshow(result)
+plt.colorbar()
 
 # %%
 result_stones = np.zeros((max_v - 1, max_v - 1))
@@ -115,9 +117,12 @@ for i in np.arange(250):
 
 
 fig, axes = plt.subplots(1, 3, figsize=(15, 5))
-axes[0].imshow(result_stones)
-axes[1].imshow(result_pores)
-axes[2].imshow(result_edges)
+im0 = axes[0].imshow(result_stones)
+fig.colorbar(im0, ax=axes[0])
+im1 = axes[1].imshow(result_pores)
+fig.colorbar(im1, ax=axes[1])
+im2 = axes[2].imshow(result_edges)
+fig.colorbar(im2, ax=axes[2])
 
 
 # %%
@@ -232,13 +237,17 @@ plt.xlim(0, max_v - 1)
 stones_pdf_image = stones_pdf_test.reshape((250, 250, 2))
 plt.figure(figsize=(5, 5))
 plt.imshow(stones_pdf_image[:, :, 0], vmin=0, vmax=max_v - 1)
+plt.colorbar()
 
 # %%
 hcm_g, vcm_g, dcm_g = get_glcm(stones_pdf_image, levels=max_v, normed=True, cut='start')
 fig, axes = plt.subplots(1, 3, figsize=(15, 5))
-axes[0].imshow(hcm_g)
-axes[1].imshow(vcm_g)
-axes[2].imshow(dcm_g)
+im0 = axes[0].imshow(hcm_g)
+fig.colorbar(im0, ax=axes[0])
+im1 = axes[1].imshow(vcm_g)
+fig.colorbar(im1, ax=axes[1])
+im2 = axes[2].imshow(dcm_g)
+fig.colorbar(im2, ax=axes[2])
 
 # %%
 h_diff = calc_euclidian_distance(hcm, hcm_g)
@@ -250,8 +259,10 @@ origin_glcm = hcm + vcm + dcm
 generated_glcm = hcm_g + vcm_g + dcm_g
 print(calc_euclidian_distance(origin_glcm, generated_glcm))
 fig, axes = plt.subplots(1, 2, figsize=(15, 5))
-axes[0].imshow(origin_glcm)
-axes[1].imshow(generated_glcm)
+im0 = axes[0].imshow(origin_glcm)
+im1 = axes[1].imshow(generated_glcm)
+fig.colorbar(im0, ax=axes[0])
+fig.colorbar(im1, ax=axes[1])
 
 
 # %%
@@ -394,10 +405,14 @@ print(np.unravel_index(np.argmax(abs_diff_he), abs_diff_he.shape))
 # %%
 def plot_glcms(glcm, glcmg, diff, generated_image):
     fig, axes = plt.subplots(1, 4, figsize=(20, 5))
-    axes[0].imshow(glcm)
-    axes[1].imshow(glcmg)
-    axes[2].imshow(diff)
-    axes[3].imshow(generated_image, vmin=0, vmax=max_v - 1)
+    im0 = axes[0].imshow(glcm)
+    im1 = axes[1].imshow(glcmg)
+    im2 = axes[2].imshow(diff)
+    im3 = axes[3].imshow(generated_image, vmin=0, vmax=max_v - 1)
+    fig.colorbar(im0, ax=axes[0])
+    fig.colorbar(im1, ax=axes[1])
+    fig.colorbar(im2, ax=axes[2])
+    fig.colorbar(im3, ax=axes[3])
     print(np.unravel_index(np.argmax(diff), diff.shape))
     
 plot_glcms(hs, hsg, abs_diff_hs, stones_pdf_image)
