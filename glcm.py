@@ -526,7 +526,7 @@ print(np.sqrt(np.sum((test_hsg - new_h_glcm) ** 2)))
 # %%time
 test_image = np.copy(stones_pdf_image)
 hs, _, _ = get_glcm(stones_image[np.newaxis, ...], levels=max_v, normed=False, cut='start')
-hsg, _, _ = get_glcm(test_image[np.newaxis, ...], levels=max_v, normed=False, cut='start')
+hsg, _, _ = get_glcm(test_image[np.newaxis, ...], levels=max_v, normed=False)
 abs_diff_hs = np.absolute(hs-hsg)
 err = np.sqrt(np.sum(abs_diff_hs ** 2))
 success_count = 0
