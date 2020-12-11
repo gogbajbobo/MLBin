@@ -129,7 +129,13 @@ fig.colorbar(im2, ax=axes[2])
 def handle_glcm(image, levels=256, symmetric=True, cut=None, size=256):
     _glcm = skimf.greycomatrix(image, [1], [0], levels=levels, symmetric=symmetric)
     _glcm = _glcm[:, :, 0, 0]
-    _glcm = _glcm[1:, 1:] if cut == 'start' else _glcm[:size, :size] if cut == 'end' else _glcm
+    if cut == 'start':
+        _glcm[0, :] = 0
+        _glcm[:, 0] = 0
+    if cut == 'end':
+        _glcm[-1, :] = 0
+        _glcm[:, -1] = 0
+#     _glcm = _glcm[1:, 1:] if cut == 'start' else _glcm[:size, :size] if cut == 'end' else _glcm
     return _glcm
     
 def sum_norm(glcm):
@@ -138,7 +144,8 @@ def sum_norm(glcm):
     return glcm
 
 def calc_glcm(arr, levels=256, symmetric=True, normed=True, cut=None, type='h'):
-    size = levels-1 if cut in ['start', 'end'] else levels
+#     size = levels-1 if cut in ['start', 'end'] else levels
+    size = levels
     glcm = np.zeros((size, size))
     axis = 0 if type == 'h' else 1 if type == 'v' else 2 if type == 'd' else ValueError('incorrect type')
     for i in np.arange(arr.shape[axis]):
