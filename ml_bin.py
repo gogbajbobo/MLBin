@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.5.2
+#       jupytext_version: 1.6.0
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -20,6 +20,7 @@
 # %%
 import helper
 import anisotropic_volume_generator as avg
+import model_of_experiment as moe
 from scipy import ndimage
 
 # %%
@@ -196,6 +197,14 @@ helper.show_2d_sections(bin_sample_filtered, x=x_slice, y=y_slice, z=z_slice)
 helper.show_2d_sections(phantom)
 
 # %%
+recon_phantom = moe.process_image(phantom, 180, noise_parameter=1000, noise_method='poisson')
+helper.show_2d_sections(recon_phantom)
+
+# %%
+recon_phantom_2 = moe.process_image(phantom, 180, noise_parameter=1000, noise_method='poisson', detector_blurring=True)
+helper.show_2d_sections(recon_phantom_2)
+
+# %%
 phantom_with_noise = np.zeros(phantom.shape)
 phantom_with_noise[phantom == True] = np.random.choice(se_values, size=(phantom[phantom == True]).shape[0], p=stones_pdf)
 phantom_with_noise[phantom == False] = np.random.choice(pd_values, size=(phantom[phantom == False]).shape[0], p=pores_pdf)
@@ -246,11 +255,13 @@ origin = bin_sample.flatten()
 helper.scatter_plot_values(x, y, origin, 'exp data', indices, xlim=xlim, ylim=ylim)
 
 # %%
-x = phantom_with_noise.flatten()
+recon_phantom_bin, _ = helper.binarize_image(recon_phantom_2)
+recon_phantom_convolute = ndimage.convolve(recon_phantom_2, kern)
+x = recon_phantom_2.flatten()
 xlim = (np.min(x), np.max(x))
-y = phantom_convolute.flatten()
+y = recon_phantom_convolute.flatten()
 ylim = (np.min(y), np.max(y))
-origin = phantom_with_noise_binarized.flatten()
+origin = phantom.flatten()
 helper.scatter_plot_values(x, y, origin, 'phantom data', indices, xlim=xlim, ylim=ylim)
 
 # %%
