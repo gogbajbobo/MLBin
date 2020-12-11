@@ -478,6 +478,9 @@ v2 = image_to_test[ry2, rx2]
 v2_left = image_to_test[ry2, rx2 - 1]
 v2_right = image_to_test[ry2, rx2 + 1]
 
+print(image_to_test[ry1-2:ry1+3, rx1-2:rx1+3])
+print(image_to_test[ry2-2:ry2+3, rx2-2:rx2+3])
+
 print(v1_left, v1, v1_right)
 print(v2_left, v2, v2_right)
 
@@ -510,7 +513,14 @@ test_speed()
     
 # print((new_h_glcm - hsg).astype(np.int))
 # print((test_hsg - hsg).astype(np.int))
-print(np.sum((test_hsg - new_h_glcm).astype(np.int)))
+
+print(hsg.astype(np.int))
+print(new_h_glcm.astype(np.int))
+print(test_hsg.astype(np.int))
+
+print((test_hsg - new_h_glcm).astype(np.int))
+
+print(np.sqrt(np.sum((test_hsg - new_h_glcm) ** 2)))
 
 # %%
 # %%time
