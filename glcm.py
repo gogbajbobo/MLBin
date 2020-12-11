@@ -454,7 +454,7 @@ hsg, _, _ = get_glcm(
 #     cut='start'
 )
 
-rx1, rx2, ry1, ry2 = np.random.randint(0, 250, 4)
+rx1, rx2, ry1, ry2 = np.random.randint(3, test_image_size-3, 4)
 new_image = switch_pixels(image_to_test, (ry1, rx1), (ry2, rx2))
 
 # %time
