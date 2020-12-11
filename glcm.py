@@ -438,7 +438,7 @@ def plot_glcms(glcm, glcmg, diff, generated_image):
     fig.colorbar(im1, ax=axes[1])
     fig.colorbar(im2, ax=axes[2])
     fig.colorbar(im3, ax=axes[3])
-    print(np.unravel_index(np.argmax(diff), diff.shape))
+    print(f'diff max: {np.unravel_index(np.argmax(diff), diff.shape)}')
     
 plot_glcms(hs, hsg, abs_diff_hs, stones_pdf_image)
 
