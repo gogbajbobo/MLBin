@@ -132,6 +132,10 @@ def mod_otsu(histogram):
         variance_between = zero_class_probability * first_class_probability \
                            * (zero_class_mean - first_class_mean) ** 2
         variance_within = total_variance - variance_between
+
+        # print(f'variance_between: {variance_between}')
+        # print(f'variance_within: {variance_within}')
+
         criteria[bin_index] \
             = zero_class_probability * np.log(zero_class_probability) \
               + first_class_probability * np.log(first_class_probability) \
