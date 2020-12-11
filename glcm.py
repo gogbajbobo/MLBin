@@ -31,7 +31,7 @@ with h5py.File(f'{file_dir}sample.h5', mode='r') as file:
     data = file['Reconstruction'][()]
 
 # %% id="5PiB93tFxl3k" colab_type="code" colab={}
-bits = 5
+bits = 4
 max_v = 2**bits
 data_int = helper.image_digitize(data, bits)
 
@@ -366,23 +366,26 @@ pores_pdf = pores_hist / np.sum(pores_hist)
 edges_pdf = edges_hist / np.sum(edges_hist)
 
 # %%
+test_image_size = 50
+
+# %%
 # %%time
-stones_pdf_data = np.random.choice(max_v - 1, size=250*250, p=stones_pdf)
+stones_pdf_data = np.random.choice(max_v - 1, size=test_image_size*test_image_size, p=stones_pdf)
 plt.hist(stones_pdf_data, bins=max_v, log=True)
 plt.xlim(0, max_v - 1)
 
-pores_pdf_data = np.random.choice(max_v - 1, size=250*250, p=pores_pdf)
+pores_pdf_data = np.random.choice(max_v - 1, size=test_image_size*test_image_size, p=pores_pdf)
 plt.hist(pores_pdf_data, bins=max_v, log=True)
 plt.xlim(0, max_v - 1)
 
-edges_pdf_data = np.random.choice(max_v - 1, size=250*250, p=edges_pdf)
+edges_pdf_data = np.random.choice(max_v - 1, size=test_image_size*test_image_size, p=edges_pdf)
 plt.hist(edges_pdf_data, bins=max_v, log=True)
 plt.xlim(0, max_v - 1)
 
 # %%
-stones_pdf_image = stones_pdf_data.reshape((250, 250))
-pores_pdf_image = pores_pdf_data.reshape((250, 250))
-edges_pdf_image = edges_pdf_data.reshape((250, 250))
+stones_pdf_image = stones_pdf_data.reshape((test_image_size, test_image_size))
+pores_pdf_image = pores_pdf_data.reshape((test_image_size, test_image_size))
+edges_pdf_image = edges_pdf_data.reshape((test_image_size, test_image_size))
 
 fig, axes = plt.subplots(1, 3, figsize=(15, 5))
 axes[0].imshow(stones_pdf_image, vmin=0, vmax=max_v - 1)
