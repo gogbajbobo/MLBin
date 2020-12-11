@@ -528,7 +528,10 @@ for i in range(num_of_iters):
     new_err = np.sqrt(np.sum(abs_diff_hs ** 2))
     
     if new_err >= err:
-        p = 1 / (1 + np.exp(new_err/(num_of_iters - i + 100)))
+#         p = 1 / (1 + np.exp(new_err/(num_of_iters - i + 100)))
+        k = new_err / (new_err * (num_of_iters - i) / num_of_iters)
+        p = 1 / (1 + np.exp(k))
+
         if p > np.random.uniform(0, 1):
             test_image = switch_pixels(test_image, coord1, coord2)
             hsg = test_hsg
@@ -541,6 +544,7 @@ for i in range(num_of_iters):
         unsuccess_count += 1
         if unsuccess_count % (num_of_iters//10) == 0:
             print(f'unsuccess_count {unsuccess_count}')
+            print(f'p {p}')
         continue
     
     success_count += 1
