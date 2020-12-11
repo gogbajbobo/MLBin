@@ -207,6 +207,21 @@ h, _, _ = get_glcm(b, levels=3, normed=False, symmetric=False)
 print(f'h\n{h}')
 
 # %%
+a1 = np.array(
+    [[0, 1],
+    [0, 2]]
+)
+print(f'y0\n{a1[0, :]}')
+print(f'x0\n{a1[:, 0]}')
+h, _, _ = get_glcm(a1[np.newaxis, ...], levels=3, normed=False, symmetric=False)
+print(f'h\n{h}')
+
+b1 = switch_pixels(a1, (0, 0), (0, 1))
+print(b1)
+h, _, _ = get_glcm(b1[np.newaxis, ...], levels=3, normed=False, symmetric=False)
+print(f'h\n{h}')
+
+# %%
 hcm, vcm, dcm = get_glcm(data_stones, levels=max_v, normed=True, cut='start')
 fig, axes = plt.subplots(1, 3, figsize=(15, 5))
 axes[0].imshow(hcm)
