@@ -535,10 +535,25 @@ trans_count = 0
 print(f'initial error: {err}')
 plot_glcms(hs, hsg, abs_diff_hs, test_image)
 
-num_of_iters = 1_000_000
+# num_of_iters = 1_000_000
+num_of_iters = 10
+
+
+def get_first_coord(im_size):
+    return np.random.randint(1, im_size-1, 2)
+
+def get_second_coord(im, coord1):
+    coord2 = np.random.randint(1, im.shape[0]-1, 2)  # assume we have square image
+    ry1, rx1 = coord1
+    ry2, rx2 = coord2
+    value1 = im[ry1, rx1]
+    value2 = im[ry2, rx2]
+    if value1 == value2:
+        return get_second_coord(im, coord1)
+    return coord2
 
 for i in range(num_of_iters):
-
+    
     if i % (num_of_iters//10) == 0:
         print(f'current error: {err}')
         plot_glcms(hs, hsg, abs_diff_hs, test_image)
@@ -549,8 +564,8 @@ for i in range(num_of_iters):
         print(f'test_hsg min max {np.min(hsg)}, {np.max(hsg)}')
 
 
-    coord1 = np.random.randint(1, test_image_size-1, 2)
-    coord2 = np.random.randint(1, test_image_size-1, 2)
+    coord1 = get_first_coord(test_image_size)
+    coord2 = get_second_coord(test_image, coord1)
 
 #     ry1, rx1 = coord1
 #     ry2, rx2 = coord2
