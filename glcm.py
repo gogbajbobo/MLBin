@@ -579,8 +579,8 @@ for i in range(num_of_iters):
 
     abs_diff_hs = np.absolute(hs - test_hsg)
     new_err = np.sqrt(np.sum(abs_diff_hs ** 2))
-    if new_err >= err:
 
+    if new_err > err:
         k = 1 * new_err / (new_err * (num_of_iters - i + 1) / num_of_iters)
         p = 1 / (1 + np.exp(k))
 
