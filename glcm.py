@@ -170,8 +170,9 @@ def d_glcm(arr, **kwargs):
     return calc_glcm(arr, **kwargs, type='d')
 
 def get_glcm(arr, levels=256, symmetric=True, normed=True, cut=None):
+    _arr = np.copy(arr)
     kwargs = {'levels': levels, 'symmetric': symmetric, 'normed': normed, 'cut': cut}
-    return h_glcm(arr, **kwargs), v_glcm(arr, **kwargs), d_glcm(arr, **kwargs)
+    return h_glcm(_arr, **kwargs), v_glcm(_arr, **kwargs), d_glcm(_arr, **kwargs)
 
 
 # %%
@@ -524,73 +525,103 @@ print(np.sqrt(np.sum((test_hsg - new_h_glcm) ** 2)))
 
 # %%
 # %%time
-test_image = np.copy(stones_pdf_image)
+current_image = np.copy(stones_pdf_image)
 hs, _, _ = get_glcm(stones_image[np.newaxis, ...], levels=max_v, normed=False, cut='start')
-hsg, _, _ = get_glcm(test_image[np.newaxis, ...], levels=max_v, normed=False)
+hsg, _, _ = get_glcm(current_image[np.newaxis, ...], levels=max_v, normed=False)
 abs_diff_hs = np.absolute(hs-hsg)
 err = np.sqrt(np.sum(abs_diff_hs ** 2))
 success_count = 0
 unsuccess_count = 0
 trans_count = 0
 print(f'initial error: {err}')
-plot_glcms(hs, hsg, abs_diff_hs, test_image)
-
-# num_of_iters = 1_000_000
-num_of_iters = 10
+plot_glcms(hs, hsg, abs_diff_hs, current_image)
 
 
 def get_first_coord(im_size):
     return np.random.randint(1, im_size-1, 2)
 
-def get_second_coord(im, coord1):
-    coord2 = np.random.randint(1, im.shape[0]-1, 2)  # assume we have square image
-    ry1, rx1 = coord1
-    ry2, rx2 = coord2
-    value1 = im[ry1, rx1]
-    value2 = im[ry2, rx2]
-    if value1 == value2:
-        return get_second_coord(im, coord1)
-    return coord2
+def get_second_coord(im, c1):
+    c2 = np.random.randint(1, im.shape[0]-1, 2)  # assume we have square image
+    y1, x1 = c1
+    y2, x2 = c2
+    v1 = im[y1, x1]
+    v2 = im[y2, x2]
+    if v1 == v2:
+        return get_second_coord(im, c1)
+    return c2
+
+def get_im_values(coord, im):
+    y, x = coord
+    v = im[y, x]
+    v_left = im[y, x - 1]
+    v_right = im[y, x + 1]
+    return v_left, v, v_right
+
+def get_new_glcm(c1, c2, im, glcm):
+    v1_l, v1, v1_r = get_im_values(c1, im)
+    v2_l, v2, v2_r = get_im_values(c2, im)
+
+    new_glcm = np.copy(glcm)
+
+    new_glcm[v1_l, v1] -= 1
+    new_glcm[v1, v1_r] -= 1
+    new_glcm[v2_l, v2] -= 1
+    new_glcm[v2, v2_r] -= 1
+
+    new_glcm[v1_l, v2] += 1
+    new_glcm[v2, v1_r] += 1
+    new_glcm[v2_l, v1] += 1
+    new_glcm[v1, v2_r] += 1
+    
+    return new_glcm
+
+def get_glcm_diff(im2test, glcm2test):
+    tmp_glcm, _, _ = get_glcm(im2test[np.newaxis, ...], levels=max_v, normed=False)
+    glcm_diff = np.sqrt(np.sum((glcm2test - tmp_glcm)**2))
+    return glcm_diff, tmp_glcm
+
+def print_glcm_diff(im2test, glcm2test):
+    glcm_diff, tmp_glcm = get_glcm_diff(im2test, glcm2test)
+    print(f'glcm diff: {glcm_diff}')
+    print(f'tmp_hsg min max {np.min(tmp_glcm)}, {np.max(tmp_glcm)}')
+    print(f'test_hsg min max {np.min(glcm2test)}, {np.max(glcm2test)}')
+    return glcm_diff
+
+
+num_of_iters = 1_000_000
 
 for i in range(num_of_iters):
     
     if i % (num_of_iters//10) == 0:
+        print('\n')
         print(f'current error: {err}')
-        plot_glcms(hs, hsg, abs_diff_hs, test_image)
-
-        tmp_hsg, _, _ = get_glcm(test_image[np.newaxis, ...], levels=max_v, normed=False)
-        print(f'glcm diff: {np.sqrt(np.sum((hsg - tmp_hsg)**2))}')
-        print(f'tmp_hsg min max {np.min(tmp_hsg)}, {np.max(tmp_hsg)}')
-        print(f'test_hsg min max {np.min(hsg)}, {np.max(hsg)}')
-
+        plot_glcms(hs, hsg, abs_diff_hs, current_image)
+        print_glcm_diff(current_image, hsg)
 
     coord1 = get_first_coord(test_image_size)
-    coord2 = get_second_coord(test_image, coord1)
+    coord2 = get_second_coord(current_image, coord1)
+        
+    test_hsg = get_new_glcm(coord1, coord2, current_image, hsg)  
+    tmp_image = switch_pixels(current_image, tuple(coord1), tuple(coord2))
 
-#     ry1, rx1 = coord1
-#     ry2, rx2 = coord2
+# I have strange results with next line, have to check it later
 
-#     v1 = test_image[ry1, rx1]
-#     v1_left = test_image[ry1, rx1 - 1]
-#     v1_right = test_image[ry1, rx1 + 1]
-#     v2 = test_image[ry2, rx2]
-#     v2_left = test_image[ry2, rx2 - 1]
-#     v2_right = test_image[ry2, rx2 + 1]
-
-#     test_hsg = np.copy(hsg)
-
-#     test_hsg[v1_left, v1] -= 1
-#     test_hsg[v1, v1_right] -= 1
-#     test_hsg[v2_left, v2] -= 1
-#     test_hsg[v2, v2_right] -= 1
-
-#     test_hsg[v1_left, v2] += 1
-#     test_hsg[v2, v1_right] += 1
-#     test_hsg[v2_left, v1] += 1
-#     test_hsg[v1, v2_right] += 1
-
-    tmp_image = switch_pixels(test_image, coord1, coord2)
-    test_hsg, _, _ = get_glcm(tmp_image[np.newaxis, ...], levels=max_v, normed=False)
+#     test_diff, tmp_glcm = get_glcm_diff(tmp_image, test_hsg)
+#     if test_diff != 0:
+#         print(f'have glcm diff!')
+#         print('was:')
+#         print(get_im_values(coord1, current_image))
+#         print(get_im_values(coord2, current_image))
+#         print('now:')
+#         print(get_im_values(coord1, tmp_image))
+#         print(get_im_values(coord2, tmp_image))
+#         print('was:')
+#         print(hsg.astype(np.int))
+#         print('manual:')
+#         print(test_hsg.astype(np.int))
+#         print('func:')
+#         print(tmp_glcm.astype(np.int))
+#         break
 
     abs_diff_hs = np.absolute(hs - test_hsg)
     new_err = np.sqrt(np.sum(abs_diff_hs ** 2))
@@ -600,8 +631,7 @@ for i in range(num_of_iters):
         p = 1 / (1 + np.exp(k))
 
         if p > np.random.uniform(0, 1):
-#             test_image = switch_pixels(test_image, coord1, coord2)
-            test_image = tmp_image
+            current_image = tmp_image
             hsg = test_hsg
             err = new_err
             trans_count += 1
@@ -615,8 +645,7 @@ for i in range(num_of_iters):
             print(f'p {p}')
         continue
 
-#     test_image = switch_pixels(test_image, coord1, coord2)
-    test_image = tmp_image
+    current_image = tmp_image
     hsg = test_hsg
     err = new_err
     success_count += 1
@@ -628,11 +657,15 @@ print(f'success_count: {success_count}')
 print(f'unsuccess_count: {unsuccess_count}')
 print(f'trans_count: {trans_count}')
 print(f'final_err: {err}')
-plot_glcms(hs, hsg, abs_diff_hs, test_image)
+plot_glcms(hs, hsg, abs_diff_hs, current_image)
 
-fig, axes = plt.subplots(1, 2, figsize=(20, 10))
+fig, axes = plt.subplots(1, 3, figsize=(30, 10))
 axes[0].imshow(stones_pdf_image)
-axes[1].imshow(test_image)
+axes[1].imshow(current_image)
+axes[2].imshow(stones_image[92:130, 12:49])
+
+# %%
+plt.imshow(stones_image[92:130, 12:49])
 
 # %%
 plt.imshow(object_image, cmap='gray')
