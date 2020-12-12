@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.7.1
+#       jupytext_version: 1.6.0
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -92,26 +92,26 @@ result_edges = np.zeros((max_v - 1, max_v - 1))
 for i in np.arange(250):
 
     result_stones += skimf.greycomatrix(
-        data_stones[:, :, i], 
-        [1], 
-        [0], 
-        levels=max_v, 
+        data_stones[:, :, i],
+        [1],
+        [0],
+        levels=max_v,
         symmetric=True
     )[1:, 1:, 0, 0]
 
     result_pores += skimf.greycomatrix(
-        data_pores[:, :, i], 
-        [1], 
-        [0], 
-        levels=max_v, 
+        data_pores[:, :, i],
+        [1],
+        [0],
+        levels=max_v,
         symmetric=True
     )[:max_v - 1, :max_v - 1, 0, 0]
 
     result_edges += skimf.greycomatrix(
-        data_edges[:, :, i], 
-        [1], 
-        [0], 
-        levels=max_v, 
+        data_edges[:, :, i],
+        [1],
+        [0],
+        levels=max_v,
         symmetric=True
     )[1:, 1:, 0, 0]
 
@@ -137,7 +137,7 @@ def handle_glcm(image, levels=256, symmetric=True, cut=None, size=256):
         _glcm[:, -1] = 0
 #     _glcm = _glcm[1:, 1:] if cut == 'start' else _glcm[:size, :size] if cut == 'end' else _glcm
     return _glcm
-    
+
 def sum_norm(glcm):
     glcm -= np.min(glcm)
     glcm /= np.sum(glcm)
@@ -152,7 +152,7 @@ def calc_glcm(arr, levels=256, symmetric=True, normed=True, cut=None, type='h'):
         if type == 'h':
             _a = arr[i, :, :]
         elif type == 'v':
-            _a = arr[:, i, :].T 
+            _a = arr[:, i, :].T
         elif type == 'd':
             _a = arr[:, :, i]
         else:
@@ -439,7 +439,7 @@ def plot_glcms(glcm, glcmg, diff, generated_image):
     fig.colorbar(im2, ax=axes[2])
     fig.colorbar(im3, ax=axes[3])
     print(f'diff max: {np.unravel_index(np.argmax(diff), diff.shape)}')
-    
+
 plot_glcms(hs, hsg, abs_diff_hs, stones_pdf_image)
 
 # %%
@@ -447,10 +447,10 @@ image_to_test = np.copy(stones_pdf_image)
 
 
 hsg, _, _ = get_glcm(
-    image_to_test[np.newaxis, ...], 
-    levels=max_v, 
-    normed=False, 
-    symmetric=False, 
+    image_to_test[np.newaxis, ...],
+    levels=max_v,
+    normed=False,
+    symmetric=False,
 #     cut='start'
 )
 
@@ -459,10 +459,10 @@ new_image = switch_pixels(image_to_test, (ry1, rx1), (ry2, rx2))
 
 # %time
 new_h_glcm, _, _ = get_glcm(
-    new_image[np.newaxis, ...], 
-    levels=max_v, 
-    normed=False, 
-    symmetric=False, 
+    new_image[np.newaxis, ...],
+    levels=max_v,
+    normed=False,
+    symmetric=False,
 #     cut='start'
 )
 
@@ -510,7 +510,7 @@ def test_speed():
 
 # %time
 test_speed()
-    
+
 # print((new_h_glcm - hsg).astype(np.int))
 # print((test_hsg - hsg).astype(np.int))
 
@@ -538,7 +538,7 @@ plot_glcms(hs, hsg, abs_diff_hs, test_image)
 num_of_iters = 1_000_000
 
 for i in range(num_of_iters):
-    
+
     if i % (num_of_iters//10) == 0:
         print(f'current error: {err}')
         plot_glcms(hs, hsg, abs_diff_hs, test_image)
@@ -551,7 +551,7 @@ for i in range(num_of_iters):
 
     coord1 = np.random.randint(1, test_image_size-1, 2)
     coord2 = np.random.randint(1, test_image_size-1, 2)
-    
+
 #     ry1, rx1 = coord1
 #     ry2, rx2 = coord2
 
@@ -563,7 +563,7 @@ for i in range(num_of_iters):
 #     v2_right = test_image[ry2, rx2 + 1]
 
 #     test_hsg = np.copy(hsg)
-        
+
 #     test_hsg[v1_left, v1] -= 1
 #     test_hsg[v1, v1_right] -= 1
 #     test_hsg[v2_left, v2] -= 1
@@ -579,8 +579,8 @@ for i in range(num_of_iters):
 
     abs_diff_hs = np.absolute(hs - test_hsg)
     new_err = np.sqrt(np.sum(abs_diff_hs ** 2))
-    
     if new_err >= err:
+
         k = 1 * new_err / (new_err * (num_of_iters - i + 1) / num_of_iters)
         p = 1 / (1 + np.exp(k))
 
@@ -599,7 +599,7 @@ for i in range(num_of_iters):
             print(f'unsuccess_count {unsuccess_count}')
             print(f'p {p}')
         continue
-    
+
 #     test_image = switch_pixels(test_image, coord1, coord2)
     test_image = tmp_image
     hsg = test_hsg
@@ -608,7 +608,7 @@ for i in range(num_of_iters):
     if success_count % (num_of_iters//10) == 0:
         print(f'success_count {success_count}')
 
-    
+
 print(f'success_count: {success_count}')
 print(f'unsuccess_count: {unsuccess_count}')
 print(f'trans_count: {trans_count}')
