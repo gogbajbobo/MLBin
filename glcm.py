@@ -31,7 +31,7 @@ with h5py.File(f'{file_dir}sample.h5', mode='r') as file:
     data = file['Reconstruction'][()]
 
 # %% id="5PiB93tFxl3k" colab_type="code" colab={}
-bits = 4
+bits = 5
 max_v = 2**bits
 data_int = helper.image_digitize(data, bits)
 
@@ -634,19 +634,21 @@ for i in range(num_of_iters):
     test_dsg = get_new_v_glcm(coord1, coord2, current_image, current_dsg)
     tmp_image = switch_pixels(current_image, tuple(coord1), tuple(coord2))
     
-    if np.min(test_hsg) < 0:
-        print(f'have less than 0 glcm value!')
-        print('was:')
-        print(get_im_h_values(coord1, current_image))
-        print(get_im_h_values(coord2, current_image))
-        print('now:')
-        print(get_im_h_values(coord1, tmp_image))
-        print(get_im_h_values(coord2, tmp_image))
-        print('was:')
-        print(current_hsg.astype(np.int))
-        print('manual:')
-        print(test_hsg.astype(np.int))
-        break
+# Sometimes manualy edited glcm have negative values, have to check it later    
+
+#     if np.min(test_hsg) < 0:
+#         print(f'have less than 0 glcm value!')
+#         print('was:')
+#         print(get_im_h_values(coord1, current_image))
+#         print(get_im_h_values(coord2, current_image))
+#         print('now:')
+#         print(get_im_h_values(coord1, tmp_image))
+#         print(get_im_h_values(coord2, tmp_image))
+#         print('was:')
+#         print(current_hsg.astype(np.int))
+#         print('manual:')
+#         print(test_hsg.astype(np.int))
+#         break
 
 
 # I have strange results with next line, have to check it later
@@ -714,10 +716,10 @@ plot_glcms(ds, current_dsg, abs_diff_ds, current_image)
 fig, axes = plt.subplots(1, 3, figsize=(30, 10))
 axes[0].imshow(stones_pdf_image)
 axes[1].imshow(current_image)
-axes[2].imshow(stones_image[149:187, 49:86])
+axes[2].imshow(data_stones[13:44, 117:148, 45])
 
 # %%
-plt.imshow(stones_image[149:187, 49:86])
+plt.imshow(data_stones[13:44, 117:148, 45])
 
 # %%
 plt.imshow(object_image, cmap='gray')
