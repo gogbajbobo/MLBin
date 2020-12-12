@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.6.0
+#       jupytext_version: 1.7.1
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -552,8 +552,8 @@ for i in range(num_of_iters):
     coord1 = np.random.randint(1, test_image_size-1, 2)
     coord2 = np.random.randint(1, test_image_size-1, 2)
     
-    ry1, rx1 = coord1
-    ry2, rx2 = coord2
+#     ry1, rx1 = coord1
+#     ry2, rx2 = coord2
 
 #     v1 = test_image[ry1, rx1]
 #     v1_left = test_image[ry1, rx1 - 1]
@@ -581,11 +581,12 @@ for i in range(num_of_iters):
     new_err = np.sqrt(np.sum(abs_diff_hs ** 2))
     
     if new_err >= err:
-        k = 2 * new_err / (new_err * (num_of_iters - i + 1) / num_of_iters)
+        k = 1 * new_err / (new_err * (num_of_iters - i + 1) / num_of_iters)
         p = 1 / (1 + np.exp(k))
 
         if p > np.random.uniform(0, 1):
-            test_image = switch_pixels(test_image, coord1, coord2)
+#             test_image = switch_pixels(test_image, coord1, coord2)
+            test_image = tmp_image
             hsg = test_hsg
             err = new_err
             trans_count += 1
@@ -599,7 +600,8 @@ for i in range(num_of_iters):
             print(f'p {p}')
         continue
     
-    test_image = switch_pixels(test_image, coord1, coord2)
+#     test_image = switch_pixels(test_image, coord1, coord2)
+    test_image = tmp_image
     hsg = test_hsg
     err = new_err
     success_count += 1
