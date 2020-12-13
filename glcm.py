@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.6.0
+#       jupytext_version: 1.7.1
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -31,7 +31,7 @@ with h5py.File(f'{file_dir}sample.h5', mode='r') as file:
     data = file['Reconstruction'][()]
 
 # %% id="5PiB93tFxl3k" colab_type="code" colab={}
-bits = 5
+bits = 8
 max_v = 2**bits
 data_int = helper.image_digitize(data, bits)
 
@@ -367,7 +367,7 @@ pores_pdf = pores_hist / np.sum(pores_hist)
 edges_pdf = edges_hist / np.sum(edges_hist)
 
 # %%
-test_image_size = 50
+test_image_size = 31
 
 # %%
 # %%time
@@ -536,7 +536,7 @@ unsuccess_count = 0
 trans_count = 0
 print(f'initial error: {err}')
 plot_glcms(hs, current_hsg, abs_diff_hs, current_image)
-plot_glcms(ds, current_dsg, abs_diff_ds, current_image)
+# plot_glcms(ds, current_dsg, abs_diff_ds, current_image)
 
 
 def get_first_coord(im_size):
@@ -616,15 +616,15 @@ def print_glcm_diff(im2test, glcm2test):
     return glcm_diff
 
 
-num_of_iters = 1_000_000
+num_of_iters = 100_000_000
 
 for i in range(num_of_iters):
 
-    if i % (num_of_iters//5) == 0:
+    if i % (num_of_iters//10) == 0:
         print('\n')
         print(f'current error: {err}')
         plot_glcms(hs, current_hsg, abs_diff_hs, current_image)
-        plot_glcms(ds, current_dsg, abs_diff_ds, current_image)
+#         plot_glcms(ds, current_dsg, abs_diff_ds, current_image)
 #         print_glcm_diff(current_image, current_hsg)
 
     coord1 = get_first_coord(test_image_size)
@@ -678,18 +678,18 @@ for i in range(num_of_iters):
     new_err = np.sqrt(np.sum(abs_diff_hs ** 2) + np.sum(abs_diff_ds ** 2))
 
     if new_err > err:
-        k = 1 * new_err / (new_err * (num_of_iters - i + 1) / num_of_iters)
+        k = 2 * new_err / (new_err * (num_of_iters - i + 1) / num_of_iters)
         p = 1 / (1 + np.exp(k))
 
-        if p > np.random.uniform(0, 1):
-            current_image = tmp_image
-            current_hsg = test_hsg
-            current_dsg = test_dsg
-            err = new_err
-            trans_count += 1
-            if trans_count % (num_of_iters//10) == 0:
-                print(f'trans_count {trans_count}')
-            continue
+#         if p > np.random.uniform(0, 1):
+#             current_image = tmp_image
+#             current_hsg = test_hsg
+#             current_dsg = test_dsg
+#             err = new_err
+#             trans_count += 1
+#             if trans_count % (num_of_iters//10) == 0:
+#                 print(f'trans_count {trans_count}')
+#             continue
 
         unsuccess_count += 1
         if unsuccess_count % (num_of_iters//10) == 0:
@@ -711,7 +711,7 @@ print(f'unsuccess_count: {unsuccess_count}')
 print(f'trans_count: {trans_count}')
 print(f'final_err: {err}')
 plot_glcms(hs, current_hsg, abs_diff_hs, current_image)
-plot_glcms(ds, current_dsg, abs_diff_ds, current_image)
+# plot_glcms(ds, current_dsg, abs_diff_ds, current_image)
 
 fig, axes = plt.subplots(1, 3, figsize=(30, 10))
 axes[0].imshow(stones_pdf_image)
@@ -720,6 +720,9 @@ axes[2].imshow(data_stones[13:44, 117:148, 45])
 
 # %%
 plt.imshow(data_stones[13:44, 117:148, 45])
+
+# %%
+stones_pdf_image.min()
 
 # %%
 plt.imshow(object_image, cmap='gray')
