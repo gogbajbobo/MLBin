@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.7.1
+#       jupytext_version: 1.6.0
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -31,7 +31,7 @@ with h5py.File(f'{file_dir}sample.h5', mode='r') as file:
     data = file['Reconstruction'][()]
 
 # %% id="5PiB93tFxl3k" colab_type="code" colab={}
-bits = 8
+bits = 4
 max_v = 2**bits
 data_int = helper.image_digitize(data, bits)
 
@@ -616,7 +616,7 @@ def print_glcm_diff(im2test, glcm2test):
     return glcm_diff
 
 
-num_of_iters = 100_000_000
+num_of_iters = 1_000_000
 
 for i in range(num_of_iters):
 
@@ -681,15 +681,15 @@ for i in range(num_of_iters):
         k = 2 * new_err / (new_err * (num_of_iters - i + 1) / num_of_iters)
         p = 1 / (1 + np.exp(k))
 
-#         if p > np.random.uniform(0, 1):
-#             current_image = tmp_image
-#             current_hsg = test_hsg
-#             current_dsg = test_dsg
-#             err = new_err
-#             trans_count += 1
-#             if trans_count % (num_of_iters//10) == 0:
-#                 print(f'trans_count {trans_count}')
-#             continue
+        if p > np.random.uniform(0, 1):
+            current_image = tmp_image
+            current_hsg = test_hsg
+            current_dsg = test_dsg
+            err = new_err
+            trans_count += 1
+            if trans_count % (num_of_iters//10) == 0:
+                print(f'trans_count {trans_count}')
+            continue
 
         unsuccess_count += 1
         if unsuccess_count % (num_of_iters//10) == 0:
@@ -716,13 +716,17 @@ plot_glcms(hs, current_hsg, abs_diff_hs, current_image)
 fig, axes = plt.subplots(1, 3, figsize=(30, 10))
 axes[0].imshow(stones_pdf_image)
 axes[1].imshow(current_image)
-axes[2].imshow(data_stones[13:44, 117:148, 45])
+axes[2].imshow(data_stones[100:131, 15:46, 0])
 
 # %%
-plt.imshow(data_stones[13:44, 117:148, 45])
+plt.imshow(data_stones[100:131, 15:46, 0])
 
 # %%
 stones_pdf_image.min()
+
+# %%
+plt.figure(figsize=(10, 10))
+plt.imshow(data[50, :, :], cmap='gray')
 
 # %%
 plt.imshow(object_image, cmap='gray')
