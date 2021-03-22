@@ -8,6 +8,6 @@ scipy
 opencv-python
 scikit-learn
 
-ipympl
-nodejs
+# ipympl
+# nodejs
 # jupyter labextension install @jupyter-widgets/jupyterlab-manager
