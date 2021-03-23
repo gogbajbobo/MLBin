@@ -20,10 +20,11 @@
 # %%
 import numpy as np
 from scipy import ndimage
+import matplotlib.pyplot as plt
 
 
 # %%
-def sigma_estimate(size=10000001, sigma=1):
+def sigma_estimate(size=10_000_000, sigma=1):
 
     range = np.arange(size)
     noise_image = np.random.random(size)
@@ -40,7 +41,8 @@ def sigma_estimate(size=10000001, sigma=1):
         return np.convolve(x, np.ones(w), 'same') / w
 
     hist, edges = np.histogram(element_lengths, bins=np.max(element_lengths))
-    ma = moving_average(hist, 20) # why 20?
+    ma_size = np.max(element_lengths) // 10
+    ma = moving_average(hist, ma_size)
     max_indicies_hist = np.where(hist == np.max(hist))
     max_indicies_ma = np.where(ma == np.max(ma))
     max_x_hist = np.round(edges[max_indicies_hist[0]])
@@ -58,10 +60,28 @@ def sigma_estimate(size=10000001, sigma=1):
 
 
 # %%
+x = []
+y = []
+y_m = []
+
 for sigma in np.arange(1, 10, 1, dtype=np.int):
-    print(f'sigma: {sigma}, calc: {sigma_estimate(sigma=sigma)}')
+    sigma_e = sigma_estimate(sigma=sigma)
+    x.append(sigma)
+    y.append(sigma_e[2])
+    y_m.append(sigma_e[3])
+    print(f'sigma: {sigma}, calc: {sigma_e}')
     
 for sigma in np.arange(10, 101, 10, dtype=np.int):
-    print(f'sigma: {sigma}, calc: {sigma_estimate(sigma=sigma)}')
+    sigma_e = sigma_estimate(sigma=sigma)
+    x.append(sigma)
+    y.append(sigma_e[2])
+    y_m.append(sigma_e[3])
+    print(f'sigma: {sigma}, calc: {sigma_e}')
+
+# %%
+plt.figure(figsize=(10, 10))
+plt.scatter(x, y, color='blue')
+plt.scatter(x, y_m, color='red')
+plt.plot(x, x, color='gray')
 
 # %%
