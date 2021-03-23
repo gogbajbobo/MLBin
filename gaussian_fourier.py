@@ -43,26 +43,25 @@ fft = np.fft.fftn(image)
 fft_abs = np.fft.fftshift(np.log(1 + np.abs(fft)))
 fft_phase = np.fft.fftshift(np.angle(fft))
 
-half_range = range - size//2
+half_range = (range - size//2) / size
 half_range = half_range[size//2:]
 fft_abs = fft_abs[size//2:]
 
-plt.figure(figsize=(10, 5))
-plt.plot(half_range, fft_abs)
+fft_abs_norm = fft_abs / np.max(fft_abs)
 
-# %%
-range_in_period = size // half_range[1:]
-
-# %%
 plt.figure(figsize=(10, 5))
-plt.plot(range_in_period, fft_abs[1:])
+plt.plot(half_range, fft_abs_norm)
+plt.semilogx()
 
 cut_off_f = 1 / (2 * np.pi * sigma)
 cut_off_period = 1 // cut_off_f
 print(f'cut_off_f: {cut_off_f:.3}, cut_off_period: {cut_off_period}, cut_off_period half: {cut_off_period // 2}')
-cut_off_f_fwhm = 1 / (2 * np.pi * sigma * 2 * np.sqrt(2 * np.log(2)))
+cut_off_f_fwhm = np.sqrt(2 * np.log(2)) / (2 * np.pi * sigma)
 cut_off_period_fwhm = 1 // cut_off_f_fwhm
 print(f'cut_off_f_fwhm: {cut_off_f_fwhm:.3}, cut_off_period_fwhm: {cut_off_period_fwhm}')
+
+plt.axvline(x=cut_off_f, color='gray')
+plt.axvline(x=cut_off_f_fwhm, color='green')
 
 # %%
 noise_image = np.random.random(size)
@@ -106,8 +105,13 @@ hist, edges, bars = plt.hist(element_lengths, bins=np.max(element_lengths))
 # interpolate_f = interpolate.interp1d(x_range, hist, kind='cubic')
 # plt.plot(interpolate_f(x_range))
 
-ma = moving_average(hist, 20) # why 20?
+ma_size = np.max(element_lengths) // 10
+ma = moving_average(hist, ma_size)
 plt.plot(ma)
+
+# tck = interpolate.splrep(x_range, hist, s=0)
+# ynew = interpolate.splev(x_range, tck, der=0)
+# plt.plot(ynew, color='red')
 
 max_indicies_hist = np.where(hist == np.max(hist))
 max_indicies_ma = np.where(ma == np.max(ma))
