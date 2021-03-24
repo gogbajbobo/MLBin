@@ -41,7 +41,7 @@ def sigma_estimate(size=10_000_000, sigma=1):
         return np.convolve(x, np.ones(w), 'same') / w
 
     hist, edges = np.histogram(element_lengths, bins=np.max(element_lengths))
-    ma_size = np.max(element_lengths) // 10
+    ma_size = (np.max(element_lengths) // 100) or 1
     ma = moving_average(hist, ma_size)
     max_indicies_hist = np.where(hist == np.max(hist))
     max_indicies_ma = np.where(ma == np.max(ma))
@@ -56,35 +56,50 @@ def sigma_estimate(size=10_000_000, sigma=1):
 #     csh = np.round(calc_sigma_hist * np.sqrt(2))
 #     csm = np.round(calc_sigma_ma * np.sqrt(2)) # why np.sqrt(2)?
     
-    
-    csh = np.round(calc_sigma_hist * np.sqrt(2 * np.log(2)))
-    csm = np.round(calc_sigma_ma * np.sqrt(2 * np.log(2))) # why np.sqrt(2 * np.log(2))?
+#     csh = np.round(calc_sigma_hist * np.sqrt(2 * np.log(2)))
+#     csm = np.round(calc_sigma_ma * np.sqrt(2 * np.log(2))) # why np.sqrt(2 * np.log(2))?
 
-    return calc_sigma_hist, calc_sigma_ma, csh, csm
+    return calc_sigma_hist, calc_sigma_ma#, csh, csm
+
 
 # %%
 x = []
-y = []
+y_h = []
 y_m = []
+y_h_1 = []
+y_m_1 = []
+y_h_2 = []
+y_m_2 = []
+k1 = np.sqrt(2 * np.log(2))
+k2 = np.sqrt(2)
+
+
+def processing_sigma(sigma):
+    sigma_e = sigma_estimate(sigma=sigma)
+    x.append(sigma)
+    y_h.append(sigma_e[0])
+    y_m.append(sigma_e[1])
+    y_h_1.append(sigma_e[0] * k1)
+    y_m_1.append(sigma_e[1] * k1)
+    y_h_2.append(sigma_e[0] * k2)
+    y_m_2.append(sigma_e[1] * k2)
+    print(f'sigma: {sigma}, calc: {sigma_e}')
+
 
 for sigma in np.arange(1, 10, 1, dtype=np.int):
-    sigma_e = sigma_estimate(sigma=sigma)
-    x.append(sigma)
-    y.append(sigma_e[2])
-    y_m.append(sigma_e[3])
-    print(f'sigma: {sigma}, calc: {sigma_e}')
+    processing_sigma(sigma)
     
 for sigma in np.arange(10, 101, 10, dtype=np.int):
-    sigma_e = sigma_estimate(sigma=sigma)
-    x.append(sigma)
-    y.append(sigma_e[2])
-    y_m.append(sigma_e[3])
-    print(f'sigma: {sigma}, calc: {sigma_e}')
+    processing_sigma(sigma)
 
 # %%
 plt.figure(figsize=(10, 10))
-plt.scatter(x, y, color='blue')
-plt.scatter(x, y_m, color='red')
 plt.plot(x, x, color='gray')
+plt.scatter(x, y_h, color='blue')
+plt.scatter(x, y_m, color='red')
+plt.scatter(x, y_h_1, color='blue', marker='+')
+plt.scatter(x, y_m_1, color='red', marker='+')
+plt.scatter(x, y_h_2, color='blue', marker='x')
+plt.scatter(x, y_m_2, color='red', marker='x')
 
 # %%
