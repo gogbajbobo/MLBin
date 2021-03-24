@@ -31,10 +31,10 @@ def sigma_estimate(size=10_000_000, sigma=1):
     image = ndimage.gaussian_filter(noise_image, sigma=sigma, truncate=4)
     bin_image = image >= 0.5
 
-    boarders = bin_image[1:] != bin_image[:-1]
-    boarders = np.append(boarders, True)
-    indexes = np.where(boarders)[0] + 1
-    line_elements = np.split(boarders, indexes)
+    borders = bin_image[1:] != bin_image[:-1]
+    borders = np.append(borders, True)
+    indexes = np.where(borders)[0] + 1
+    line_elements = np.split(borders, indexes)
     element_lengths = np.array([len(elem) for elem in line_elements])[:-1]
 
     def moving_average(x, w):
