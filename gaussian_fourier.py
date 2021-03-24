@@ -22,6 +22,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import ndimage
 from scipy import interpolate
+import cv2
 
 # %%
 size = 10000000
@@ -84,14 +85,13 @@ plt.figure(figsize=(15, 5))
 plt.plot(bin_image[:500])
 
 # %%
-boarders = bin_image[1:] != bin_image[:-1]
-boarders = np.append(boarders, True)
-indexes = np.where(boarders)[0] + 1
-line_elements = np.split(boarders, indexes)
+borders = bin_image[1:] != bin_image[:-1]
+borders = np.append(borders, True)
+indexes = np.where(borders)[0] + 1
+line_elements = np.split(borders, indexes)
 element_lengths = np.array([len(elem) for elem in line_elements])[:-1]
 # element_lengths = np.array(list(filter(lambda el: el, element_lengths)))
 # el_lengths = np.append(el_lengths, element_lengths)
-
 
 print(f'element_lengths: {element_lengths}, sum: {np.sum(element_lengths)}')
 
@@ -143,5 +143,180 @@ calc_sigma = period * np.sqrt(2 * np.log(2)) // (2 * np.pi)
 print(f'calc_sigma: {calc_sigma}')
 
 # %%
+eq_image = image
+
+eq_image = cv2.normalize(image, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
+eq_image = cv2.equalizeHist(eq_image)
+eq_image = eq_image / np.max(eq_image)
+
+plt.figure(figsize=(15, 5))
+plt.plot(eq_image[:500])
+
+bin_image = eq_image >= 0.3
+plt.figure(figsize=(15, 5))
+plt.plot(bin_image[:500])
+
+# %%
+borders = bin_image[1:] != bin_image[:-1]
+borders = np.append(borders, True)
+indexes = np.where(borders)[0] + 1
+
+line_elements = np.split(bin_image, indexes) # use bin_image instead of borders earlier
+element_lengths = np.array([len(elem) for elem in line_elements])[:-1]
+
+print(f'element_lengths: {element_lengths}, sum: {np.sum(element_lengths)}')
+
+line_elements = np.array([elem.flatten() for elem in line_elements], dtype=object)[:-1]
+
+true_elements = filter(lambda x: x[0] == True, line_elements)
+true_element_lengths = np.array([len(elem) for elem in true_elements])
+
+false_elements = filter(lambda x: x[0] == False, line_elements)
+false_element_lengths = np.array([len(elem) for elem in false_elements])
+
+print(f'true_element_lengths: {true_element_lengths}, sum: {np.sum(true_element_lengths)}')
+print(f'false_element_lengths: {false_element_lengths}, sum: {np.sum(false_element_lengths)}')
+
+# %%
+plt.figure(figsize=(15, 5))
+max_value = np.max(true_element_lengths)
+hist, edges, bars = plt.hist(true_element_lengths, bins=max_value)
+
+ma_size = max_value // 100
+ma = moving_average(hist, ma_size)
+plt.plot(ma)
+
+max_indicies_hist = np.where(hist == np.max(hist))
+max_indicies_ma = np.where(ma == np.max(ma))
+max_x_hist = np.round(edges[max_indicies_hist[0]])
+max_x_ma = np.round(edges[max_indicies_ma[0]])
+print(f'max_x_hist: {max_x_hist}, max_x_ma: {max_x_ma}')
+
+# %%
+plt.figure(figsize=(15, 5))
+max_value = np.max(false_element_lengths)
+hist, edges, bars = plt.hist(false_element_lengths, bins=max_value)
+
+ma_size = max_value // 100
+ma = moving_average(hist, ma_size)
+plt.plot(ma)
+
+max_indicies_hist = np.where(hist == np.max(hist))
+max_indicies_ma = np.where(ma == np.max(ma))
+max_x_hist = np.round(edges[max_indicies_hist[0]])
+max_x_ma = np.round(edges[max_indicies_ma[0]])
+print(f'max_x_hist: {max_x_hist}, max_x_ma: {max_x_ma}')
+
+# %%
+bin_image = eq_image >= 0.7
+plt.figure(figsize=(15, 5))
+plt.plot(bin_image[:500])
+
+# %%
+borders = bin_image[1:] != bin_image[:-1]
+borders = np.append(borders, True)
+indexes = np.where(borders)[0] + 1
+
+line_elements = np.split(bin_image, indexes) # use bin_image instead of borders earlier
+element_lengths = np.array([len(elem) for elem in line_elements])[:-1]
+
+print(f'element_lengths: {element_lengths}, sum: {np.sum(element_lengths)}')
+
+line_elements = np.array([elem.flatten() for elem in line_elements], dtype=object)[:-1]
+
+true_elements = filter(lambda x: x[0] == True, line_elements)
+true_element_lengths = np.array([len(elem) for elem in true_elements])
+
+false_elements = filter(lambda x: x[0] == False, line_elements)
+false_element_lengths = np.array([len(elem) for elem in false_elements])
+
+print(f'true_element_lengths: {true_element_lengths}, sum: {np.sum(true_element_lengths)}')
+print(f'false_element_lengths: {false_element_lengths}, sum: {np.sum(false_element_lengths)}')
+
+# %%
+plt.figure(figsize=(15, 5))
+max_value = np.max(true_element_lengths)
+hist, edges, bars = plt.hist(true_element_lengths, bins=max_value)
+
+ma_size = max_value // 100
+ma = moving_average(hist, ma_size)
+plt.plot(ma)
+
+max_indicies_hist = np.where(hist == np.max(hist))
+max_indicies_ma = np.where(ma == np.max(ma))
+max_x_hist = np.round(edges[max_indicies_hist[0]])
+max_x_ma = np.round(edges[max_indicies_ma[0]])
+print(f'max_x_hist: {max_x_hist}, max_x_ma: {max_x_ma}')
+
+# %%
+plt.figure(figsize=(15, 5))
+max_value = np.max(false_element_lengths)
+hist, edges, bars = plt.hist(false_element_lengths, bins=max_value)
+
+ma_size = max_value // 100
+ma = moving_average(hist, ma_size)
+plt.plot(ma)
+
+max_indicies_hist = np.where(hist == np.max(hist))
+max_indicies_ma = np.where(ma == np.max(ma))
+max_x_hist = np.round(edges[max_indicies_hist[0]])
+max_x_ma = np.round(edges[max_indicies_ma[0]])
+print(f'max_x_hist: {max_x_hist}, max_x_ma: {max_x_ma}')
+
+# %%
+bin_image = eq_image >= 0.1
+plt.figure(figsize=(15, 5))
+plt.plot(bin_image[:500])
+
+# %%
+borders = bin_image[1:] != bin_image[:-1]
+borders = np.append(borders, True)
+indexes = np.where(borders)[0] + 1
+
+line_elements = np.split(bin_image, indexes) # use bin_image instead of borders earlier
+element_lengths = np.array([len(elem) for elem in line_elements])[:-1]
+
+print(f'element_lengths: {element_lengths}, sum: {np.sum(element_lengths)}')
+
+line_elements = np.array([elem.flatten() for elem in line_elements], dtype=object)[:-1]
+
+true_elements = filter(lambda x: x[0] == True, line_elements)
+true_element_lengths = np.array([len(elem) for elem in true_elements])
+
+false_elements = filter(lambda x: x[0] == False, line_elements)
+false_element_lengths = np.array([len(elem) for elem in false_elements])
+
+print(f'true_element_lengths: {true_element_lengths}, sum: {np.sum(true_element_lengths)}')
+print(f'false_element_lengths: {false_element_lengths}, sum: {np.sum(false_element_lengths)}')
+
+# %%
+plt.figure(figsize=(15, 5))
+max_value = np.max(true_element_lengths)
+hist, edges, bars = plt.hist(true_element_lengths, bins=max_value)
+
+ma_size = max_value // 100
+ma = moving_average(hist, ma_size)
+plt.plot(ma)
+
+max_indicies_hist = np.where(hist == np.max(hist))
+max_indicies_ma = np.where(ma == np.max(ma))
+max_x_hist = np.round(edges[max_indicies_hist[0]])
+max_x_ma = np.round(edges[max_indicies_ma[0]])
+print(f'max_x_hist: {max_x_hist}, max_x_ma: {max_x_ma}')
+
+# %%
+plt.figure(figsize=(15, 5))
+max_value = np.max(false_element_lengths)
+hist, edges, bars = plt.hist(false_element_lengths, bins=max_value)
+
+ma_size = max_value // 100
+ma = moving_average(hist, ma_size)
+plt.plot(ma)
+
+max_indicies_hist = np.where(hist == np.max(hist))
+max_indicies_ma = np.where(ma == np.max(ma))
+max_x_hist = np.round(edges[max_indicies_hist[0]])
+max_x_ma = np.round(edges[max_indicies_ma[0]])
+print(f'max_x_hist: {max_x_hist}, max_x_ma: {max_x_ma}')
 
 # %%
