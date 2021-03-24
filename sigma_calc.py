@@ -56,11 +56,11 @@ def sigma_estimate(size=10_000_000, sigma=1):
 #     csh = np.round(calc_sigma_hist * np.sqrt(2))
 #     csm = np.round(calc_sigma_ma * np.sqrt(2)) # why np.sqrt(2)?
     
+    
     csh = np.round(calc_sigma_hist * np.sqrt(2 * np.log(2)))
     csm = np.round(calc_sigma_ma * np.sqrt(2 * np.log(2))) # why np.sqrt(2 * np.log(2))?
 
     return calc_sigma_hist, calc_sigma_ma, csh, csm
-
 
 # %%
 x = []
