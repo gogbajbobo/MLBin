@@ -24,11 +24,11 @@ from scipy import ndimage
 from scipy import interpolate
 
 # %%
-size = 100001
+size = 10000000
 range = np.arange(size)
 
 # %%
-sigma = 10
+sigma = 20
 delta_image = np.zeros(size)
 delta_image[size//2] = 1
 image = ndimage.gaussian_filter(delta_image, sigma=sigma, truncate=4)
@@ -49,35 +49,39 @@ fft_abs = fft_abs[size//2:]
 
 fft_abs_norm = fft_abs / np.max(fft_abs)
 
+# %%
 plt.figure(figsize=(10, 5))
 plt.plot(half_range, fft_abs_norm)
 plt.semilogx()
 
 cut_off_f = 1 / (2 * np.pi * sigma)
 cut_off_period = 1 // cut_off_f
-print(f'cut_off_f: {cut_off_f:.3}, cut_off_period: {cut_off_period}, cut_off_period half: {cut_off_period // 2}')
+print(f'cut_off_f: {cut_off_f:.3}, cut_off_period: {cut_off_period}, half: {cut_off_period // 2}')
 cut_off_f_fwhm = np.sqrt(2 * np.log(2)) / (2 * np.pi * sigma)
 cut_off_period_fwhm = 1 // cut_off_f_fwhm
-print(f'cut_off_f_fwhm: {cut_off_f_fwhm:.3}, cut_off_period_fwhm: {cut_off_period_fwhm}')
+print(f'cut_off_f_fwhm: {cut_off_f_fwhm:.3}, cut_off_period_fwhm: {cut_off_period_fwhm}, half: {cut_off_period_fwhm // 2}')
+
+cut_off_f_e = np.sqrt(2 * np.log(np.e)) / (2 * np.pi * sigma)
 
 plt.axvline(x=cut_off_f, color='gray')
 plt.axvline(x=cut_off_f_fwhm, color='green')
+plt.axvline(x=cut_off_f_e, color='black')
 
 # %%
 noise_image = np.random.random(size)
 
-plt.figure(figsize=(10, 5))
-plt.plot(noise_image)
+plt.figure(figsize=(15, 5))
+plt.plot(noise_image[:500])
 
 # %%
 image = ndimage.gaussian_filter(noise_image, sigma=sigma, truncate=4)
-plt.figure(figsize=(10, 5))
-plt.plot(image)
+plt.figure(figsize=(15, 5))
+plt.plot(image[:500])
 
 # %%
 bin_image = image >= 0.5
-plt.figure(figsize=(10, 5))
-plt.plot(bin_image)
+plt.figure(figsize=(15, 5))
+plt.plot(bin_image[:500])
 
 # %%
 boarders = bin_image[1:] != bin_image[:-1]
@@ -105,7 +109,7 @@ hist, edges, bars = plt.hist(element_lengths, bins=np.max(element_lengths))
 # interpolate_f = interpolate.interp1d(x_range, hist, kind='cubic')
 # plt.plot(interpolate_f(x_range))
 
-ma_size = np.max(element_lengths) // 10
+ma_size = np.max(element_lengths) // 100
 ma = moving_average(hist, ma_size)
 plt.plot(ma)
 
@@ -137,5 +141,7 @@ period = np.mean(max_x_ma) * 2
 calc_sigma = period * np.sqrt(2 * np.log(2)) // (2 * np.pi)
 
 print(f'calc_sigma: {calc_sigma}')
+
+# %%
 
 # %%
