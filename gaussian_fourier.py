@@ -120,8 +120,21 @@ max_x_ma = np.round(edges[max_indicies_ma[0]])
 print(f'max_x_hist: {max_x_hist}, max_x_ma: {max_x_ma}')
 
 # %%
-period = max_x_ma * 2
-calc_sigma = period // (2 * np.pi)
+# https://en.wikipedia.org/wiki/Gaussian_filter
+# use FWHM
+
+period = np.mean(max_x_ma) * 2
+freq = 1 / period
+freq_sigma = freq / np.sqrt(2 * np.log(2))
+calc_sigma =  1 // (freq_sigma * 2 * np.pi)
+
+print(f'calc_sigma: {calc_sigma}')
+
+
+# short version
+
+period = np.mean(max_x_ma) * 2
+calc_sigma = period * np.sqrt(2 * np.log(2)) // (2 * np.pi)
 
 print(f'calc_sigma: {calc_sigma}')
 
