@@ -143,8 +143,6 @@ calc_sigma = period * np.sqrt(2 * np.log(2)) // (2 * np.pi)
 print(f'calc_sigma: {calc_sigma}')
 
 # %%
-eq_image = image
-
 eq_image = cv2.normalize(image, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
 eq_image = cv2.equalizeHist(eq_image)
 eq_image = eq_image / np.max(eq_image)
