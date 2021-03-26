@@ -139,6 +139,7 @@ print(f'calc_sigma: {calc_sigma}')
 
 period = np.mean(max_x_ma) * 2
 calc_sigma = period * np.sqrt(2 * np.log(2)) // (2 * np.pi)
+# calc_sigma = period * np.sqrt(2 * np.log(np.e)) // (2 * np.pi) # np.e is better as 2
 
 print(f'calc_sigma: {calc_sigma}')
 
