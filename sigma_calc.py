@@ -167,7 +167,7 @@ def sigma_estimate_2(size=10_000_000, sigma=1, porosity=0.5):
 k = np.sqrt(2 * np.log(np.e))
 
 def processing_sigma_2(sigma, porosity, x, y_h, y_m):
-    sigma_e = sigma_estimate_2(sigma=sigma)
+    sigma_e = sigma_estimate_2(sigma=sigma, porosity=porosity)
     x.append(sigma)
     y_h.append(sigma_e[0] * k)
     y_m.append(sigma_e[1] * k)
