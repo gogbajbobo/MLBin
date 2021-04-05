@@ -137,6 +137,7 @@ print(max_fit_value_index)
 
 plt.figure(figsize=(15, 5))
 plt.plot(hist/np.sum(hist))
+plt.plot(ma/np.sum(ma))
 plt.plot(edges, fit_values)
 plt.semilogx()
 
