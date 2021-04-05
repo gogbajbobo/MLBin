@@ -22,10 +22,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import ndimage
 from scipy import interpolate
+from scipy import stats
+from scipy import odr
 import cv2
 
 # %%
-size = 10000000
+size = 10_000_000
 range = np.arange(size)
 
 # %%
@@ -103,6 +105,7 @@ def moving_average(x, w):
 
 # %%
 plt.figure(figsize=(15, 5))
+plt.semilogx()
 hist, edges, bars = plt.hist(element_lengths, bins=np.max(element_lengths))
 
 # x_range = np.arange(np.max(element_lengths))
@@ -122,6 +125,37 @@ max_indicies_ma = np.where(ma == np.max(ma))
 max_x_hist = np.round(edges[max_indicies_hist[0]])
 max_x_ma = np.round(edges[max_indicies_ma[0]])
 print(f'max_x_hist: {max_x_hist}, max_x_ma: {max_x_ma}')
+
+# %%
+fit_func = stats.invgauss
+
+params = fit_func.fit(element_lengths)
+print(params)
+fit_values = fit_func.pdf(edges, *params)
+max_fit_value_index = np.where(fit_values == np.max(fit_values))
+print(max_fit_value_index)
+
+plt.figure(figsize=(15, 5))
+plt.plot(hist/np.sum(hist))
+plt.plot(edges, fit_values)
+plt.semilogx()
+
+# %%
+x = edges[:-1]
+y = hist
+
+poly_model = odr.polynomial(3)
+data = odr.Data(x, y)
+odr_obj = odr.ODR(data, poly_model)
+output = odr_obj.run()
+
+poly = np.poly1d(output.beta[::-1])
+poly_y = poly(x)
+
+plt.figure(figsize=(15, 5))
+plt.plot(x, y)
+plt.plot(x, poly_y)
+plt.semilogx()
 
 # %%
 # https://en.wikipedia.org/wiki/Gaussian_filter
@@ -192,6 +226,21 @@ max_x_ma = np.round(edges[max_indicies_ma[0]])
 print(f'max_x_hist: {max_x_hist}, max_x_ma: {max_x_ma}')
 
 # %%
+fit_func = stats.invgauss
+
+params = fit_func.fit(true_element_lengths)
+print(params)
+fit_values = fit_func.pdf(edges, *params)
+max_fit_value_index = np.where(fit_values == np.max(fit_values))
+print(max_fit_value_index)
+
+plt.figure(figsize=(15, 5))
+plt.plot(hist/np.sum(hist))
+plt.plot(ma/np.sum(ma))
+plt.plot(edges, fit_values)
+plt.semilogx()
+
+# %%
 plt.figure(figsize=(15, 5))
 max_value = np.max(false_element_lengths)
 hist, edges, bars = plt.hist(false_element_lengths, bins=max_value)
@@ -205,6 +254,21 @@ max_indicies_ma = np.where(ma == np.max(ma))
 max_x_hist = np.round(edges[max_indicies_hist[0]])
 max_x_ma = np.round(edges[max_indicies_ma[0]])
 print(f'max_x_hist: {max_x_hist}, max_x_ma: {max_x_ma}')
+
+# %%
+fit_func = stats.invgauss
+
+params = fit_func.fit(false_element_lengths)
+print(params)
+fit_values = fit_func.pdf(edges, *params)
+max_fit_value_index = np.where(fit_values == np.max(fit_values))
+print(max_fit_value_index)
+
+plt.figure(figsize=(15, 5))
+plt.plot(hist/np.sum(hist))
+plt.plot(ma/np.sum(ma))
+plt.plot(edges, fit_values)
+plt.semilogx()
 
 # %%
 bin_image = eq_image >= 0.7
