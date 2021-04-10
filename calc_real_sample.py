@@ -23,7 +23,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 from skimage.filters import threshold_otsu, gaussian
 from scipy import stats
+from scipy import ndimage
 from scipy.signal import convolve2d
+import cv2
+
+# %%
+path = '/Users/grimax/Downloads/sample.h5'
+with h5py.File(path, 'r') as h5f:
+    img2d = np.array(h5f['layer1'][:])
+
+plt.imshow(img2d)
 
 
 # %%
@@ -59,7 +68,7 @@ def calc_sigma(element_lengths):
     max_value = np.max(element_lengths)
     hist, edges = np.histogram(element_lengths, bins=max_value)    
     
-    print(f'max_value {max_value}')
+#     print(f'max_value {max_value}')
     plt.plot(hist)
     plt.semilogx()
     
@@ -97,17 +106,17 @@ def get_sigma_from_bin_image(bin_img):
     false_elements = filter(lambda x: x[0] == False, line_elements)
     false_element_lengths = np.array([len(elem) for elem in false_elements])
 
-    print(f'true_element_lengths {true_element_lengths}')
-    print(f'false_element_lengths {false_element_lengths}')
+#     print(f'true_element_lengths {true_element_lengths}')
+#     print(f'false_element_lengths {false_element_lengths}')
 
     true_sigma_h, true_sigma_ma, true_sigma_fit = calc_sigma(true_element_lengths)
     false_sigma_h, false_sigma_ma, false_sigma_fit = calc_sigma(false_element_lengths)
     
-    print('true_sigma_h, true_sigma_ma, true_sigma_fit')
-    print(true_sigma_h, true_sigma_ma, true_sigma_fit)
+#     print('true_sigma_h, true_sigma_ma, true_sigma_fit')
+#     print(true_sigma_h, true_sigma_ma, true_sigma_fit)
     
-    print('false_sigma_h, false_sigma_ma, false_sigma_fit')
-    print(false_sigma_h, false_sigma_ma, false_sigma_fit)
+#     print('false_sigma_h, false_sigma_ma, false_sigma_fit')
+#     print(false_sigma_h, false_sigma_ma, false_sigma_fit)
 
     k = np.sqrt(2 * np.log(np.e))
 
@@ -116,40 +125,53 @@ def get_sigma_from_bin_image(bin_img):
     sigma_by_max_of_fit = k * (true_sigma_fit + false_sigma_fit)
 
     print(sigma_by_max_value, sigma_by_max_of_ma, sigma_by_max_of_fit)
+    
+    return sigma_by_max_value, sigma_by_max_of_ma, sigma_by_max_of_fit
 
 
 # %%
-path = '/Users/grimax/Downloads/sample.h5'
-with h5py.File(path, 'r') as h5f:
-    img2d = np.array(h5f['layer1'][:])
+def porous_generator(size=(100, 100), sigma=1, porosity=0.5):
+    
+    noise_image = np.random.random(size)
+    image = ndimage.gaussian_filter(noise_image, sigma=sigma, truncate=4)
+    
+    eq_image = cv2.normalize(image, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
+    eq_image = cv2.equalizeHist(eq_image)
+    eq_image = eq_image / np.max(eq_image)
 
-plt.imshow(img2d)
-print(np.max(img2d), np.min(img2d))
-
-# %%
-thresh = threshold_otsu(img2d)
-bin_img = img2d >= thresh
-plt.imshow(bin_img)
-
-# %%
-get_sigma_from_bin_image(bin_img)
+    bin_image = eq_image >= porosity
+    
+    return bin_image
 
 
 # %%
-def calc_filtered_image(img2d, filter_width):
+def get_porosity_from_image(image):
+    porosity = np.sum(image) / image.size
+    print(f'porosity: {porosity}')
+    return porosity
 
-    filtered_image = convolve2d(img2d, np.ones((filter_width, filter_width)), mode='same')
+
+# %%
+def calc_filtered_image(image, filter_width):
+
+    filtered_image = convolve2d(image, np.ones((filter_width, filter_width)), mode='same')
     thresh = threshold_otsu(filtered_image)
     bin_img = filtered_image >= thresh
-    print(np.max(filtered_image), np.min(filtered_image))
 
-    fig, axes = plt.subplots(1, 2, figsize=(10, 5))
+    s1, s2, s3 = get_sigma_from_bin_image(bin_img)
+    porosity = get_porosity_from_image(bin_img)
+        
+    generated_image = porous_generator(image.shape, sigma=s1, porosity=porosity)
+    
+    fig, axes = plt.subplots(1, 3, figsize=(15, 5))
     axes[0].imshow(filtered_image)
     axes[1].imshow(bin_img)
+    axes[2].imshow(generated_image)
 
-    plt.figure()
-    get_sigma_from_bin_image(bin_img)
 
+# %%
+# this is equvivalent to nonfiltered original image
+calc_filtered_image(img2d, 1)
 
 # %%
 calc_filtered_image(img2d, 3)
@@ -158,9 +180,12 @@ calc_filtered_image(img2d, 3)
 calc_filtered_image(img2d, 5)
 
 # %%
-calc_filtered_image(img2d, 7)
+calc_filtered_image(img2d, 9)
 
 # %%
-calc_filtered_image(img2d, 9)
+calc_filtered_image(img2d, 15)
+
+# %%
+calc_filtered_image(img2d, 25)
 
 # %%
