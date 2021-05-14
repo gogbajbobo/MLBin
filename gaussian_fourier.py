@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.6.0
+#       jupytext_version: 1.11.1
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -127,7 +127,7 @@ max_x_ma = np.round(edges[max_indicies_ma[0]])
 print(f'max_x_hist: {max_x_hist}, max_x_ma: {max_x_ma}')
 
 # %%
-fit_func = stats.invgauss
+fit_func = stats.invgamma
 
 params = fit_func.fit(element_lengths)
 print(params)
@@ -227,10 +227,11 @@ max_x_ma = np.round(edges[max_indicies_ma[0]])
 print(f'max_x_hist: {max_x_hist}, max_x_ma: {max_x_ma}')
 
 # %%
-fit_func = stats.invgauss
+fit_func = stats.gengamma
 
 params = fit_func.fit(true_element_lengths)
-print(params)
+a, c, loc, scale = params
+print(a, c, loc, scale)
 fit_values = fit_func.pdf(edges, *params)
 max_fit_value_index = np.where(fit_values == np.max(fit_values))
 print(max_fit_value_index)
@@ -257,11 +258,13 @@ max_x_ma = np.round(edges[max_indicies_ma[0]])
 print(f'max_x_hist: {max_x_hist}, max_x_ma: {max_x_ma}')
 
 # %%
-fit_func = stats.invgauss
+fit_func = stats.gengamma
 
 params = fit_func.fit(false_element_lengths)
-print(params)
-fit_values = fit_func.pdf(edges, *params)
+a, c, loc, scale = params
+print(a, c, loc, scale)
+fit_values = fit_func.pdf(edges, a, c, loc, scale)
+
 max_fit_value_index = np.where(fit_values == np.max(fit_values))
 print(max_fit_value_index)
 
