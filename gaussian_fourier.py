@@ -115,7 +115,7 @@ hist, edges, bars = plt.hist(element_lengths, bins=np.max(element_lengths))
 
 ma_size = np.max(element_lengths) // 100
 ma = moving_average(hist, ma_size)
-plt.plot(ma, linewidth=3)
+plt.plot(ma, 'r-', linewidth=3)
 
 # tck = interpolate.splrep(x_range, hist, s=0)
 # ynew = interpolate.splev(x_range, tck, der=0)
