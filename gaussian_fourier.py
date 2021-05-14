@@ -105,7 +105,8 @@ def moving_average(x, w):
 
 # %%
 plt.figure(figsize=(15, 5))
-plt.semilogx()
+plt.xlim([0, 500])
+# plt.semilogx()
 hist, edges, bars = plt.hist(element_lengths, bins=np.max(element_lengths))
 
 # x_range = np.arange(np.max(element_lengths))
@@ -114,7 +115,7 @@ hist, edges, bars = plt.hist(element_lengths, bins=np.max(element_lengths))
 
 ma_size = np.max(element_lengths) // 100
 ma = moving_average(hist, ma_size)
-plt.plot(ma)
+plt.plot(ma, linewidth=3)
 
 # tck = interpolate.splrep(x_range, hist, s=0)
 # ynew = interpolate.splev(x_range, tck, der=0)
