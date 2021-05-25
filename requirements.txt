@@ -7,7 +7,7 @@ numpy
 scipy
 opencv-python
 scikit-learn
-
+seaborn
 # ipympl
 # nodejs
 # jupyter labextension install @jupyter-widgets/jupyterlab-manager

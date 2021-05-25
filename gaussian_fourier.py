@@ -25,6 +25,7 @@ from scipy import interpolate
 from scipy import stats
 from scipy import odr
 import cv2
+import seaborn as sns
 
 # %%
 size = 10_000_000
@@ -126,6 +127,11 @@ max_indicies_ma = np.where(ma == np.max(ma))
 max_x_hist = np.round(edges[max_indicies_hist[0]])
 max_x_ma = np.round(edges[max_indicies_ma[0]])
 print(f'max_x_hist: {max_x_hist}, max_x_ma: {max_x_ma}')
+
+# %%
+plt.figure(figsize=(15, 5))
+plt.xlim([0, 500])
+sns.histplot(element_lengths, bins=np.max(element_lengths), kde=True)
 
 # %%
 fit_func = stats.invgamma
